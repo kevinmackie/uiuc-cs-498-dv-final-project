@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>CS 498 DV Final Project by Kevin Mackie</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.0/d3-annotation.js"></script><link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="chart.css"/>
+    <script type="text/javascript" src="loaddata.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-7 text-lg-left"><h3 align="center">Research on SCADA Cybersecurity</h3></div>
+        <div class="col-md-2">
+            <p></p>
+            <p><a type="button" class="btn btn-sm btn-info" href="/about" role="button" target="_blank">About the Visualization</a></p>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    <div class="row narrative">
+        <div class="col-md-2">
+            <div class="container" align="left">
+                <span class="btn btn-info btn-md glyphicon glyphicon-hand-left disabled toggle-enabled-1" onclick="frameBack()"></span>
+                <span class="btn btn-info btn-md glyphicon glyphicon-hand-right toggle-enabled-4" onclick="frameForward()"></span>
+            </div>
+        </div>
+        <div class="col-md-8 toggle-visibility-1">
+            <p>This website will teach you about and give you an opportunity to explore the research literature on SCADA cybersecurity.
+                SCADA systems are centralized monitoring and systems for pipelines, electrical grids, etc.</p>
+        </div>
+        <div id="n-01" class="invisible toggle-visibility-1 toggle-visibility-2">
+            <p>In the 80s and 90s there is relatively little cybersecurity research. </p>
+        </div>
+        <div id="n-02" class="invisible toggle-visibility-2 toggle-visibility-3">
+            <p>But post 9-11 there is an abrupt increase in the amount of research.</p>
+        </div>
+        <div id="n-03" class="invisible toggle-visibility-3 toggle-visibility-4">
+            <p>The graph below shows all of the papers on Scopus related to "SCADA" and "cybersecurity", number of
+                papers published per year and total citations received to date for papers published in a year.</p>
+        </div>
+        <div id="n-04" class="invisible toggle-visibility-4 toggle-visibility-5">
+            <p>The graph below shows all of the papers on Scopus related to "SCADA" and "cybersecurity", number of
+                papers published per year and total citations received to date for papers published in a year.</p>
+        </div>
+        <div id="n-05" class="invisible">
+            <p>The graph below shows all of the papers on Scopus related to "SCADA" and "cybersecurity", number of
+                papers published per year and total citations received to date for papers published in a year.</p>
+        </div>
+        <div id="n-06" class="invisible">
+            <p>The graph below shows all of the papers on Scopus related to "SCADA" and "cybersecurity", number of
+                papers published per year and total citations received to date for papers published in a year.</p>
+        </div>
+
+        <hr>
+        <div class="col-md-2"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-9">
+            <svg class="chart"></svg>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+
+</div>
+</body>
+
+</html>

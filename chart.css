@@ -1,0 +1,94 @@
+body {
+    font-size: 100%;
+}
+
+p {
+    font: 1.5em sans-serif;
+}
+div.narrative {
+    display:block;
+    height: 105px;
+}
+
+.annotation .invisible {
+    display: none;
+}
+
+.annotation .visible {
+    display: block;
+}
+
+div.narrative .invisible{
+    display: none;
+    height: 0px;
+}
+.chart rect.bar-papers {
+    fill: orange;
+}
+
+.chart rect.bar-papers:hover {
+    fill: darkorange;
+}
+
+.chart rect.bar-citations {
+    fill: lightsteelblue;
+}
+
+.chart rect.bar-citations:hover {
+    fill: cornflowerblue;
+}
+
+.chart text {
+    fill: black;
+    font: 10px sans-serif;
+    text-anchor: end;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    height: 50px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: white;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+
+/* Remove the navbar's default margin-bottom and rounded borders */
+.navbar {
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+.row.content {height: 450px}
+
+/* Set gray background color and 100% height */
+.sidenav {
+    padding-top: 20px;
+    background-color: #f1f1f1;
+    height: 100%;
+}
+
+/* Set black background color, white text and some padding */
+footer {
+    background-color: #555;
+    color: white;
+    padding: 15px;
+}
+
+.attack {
+    style: "color:red"
+}
+/* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+    .sidenav {
+        height: auto;
+        padding: 15px;
+    }
+    .row.content {height:auto;}
+}
