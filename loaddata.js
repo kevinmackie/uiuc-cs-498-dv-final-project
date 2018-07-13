@@ -32,7 +32,7 @@ function toggleEnabled() {
     }
 }
 
-d3.dsv(",", "http://kevinmackie.github.com/uiuc-cs-498-dv-final-project/data.csv", function(d) {
+d3.dsv(",", "https://kevinmackie.github.com/uiuc-cs-498-dv-final-project/data.csv", function(d) {
 
     const dataobj = {
         year: +d.Year,
