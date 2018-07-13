@@ -60,7 +60,6 @@ d3.dsv(",", "./data.csv", function(d) {
 
     const x_year = d3.scaleBand()
         .range([0, chart_dimensions.width])
-        //.round(true)
         .domain(d3.keys(referencesByYear));
 
     const y_papers = d3.scaleLinear()
@@ -70,6 +69,7 @@ d3.dsv(",", "./data.csv", function(d) {
     const y_citations = d3.scaleLinear()
         .domain([0, d3.max(referenceData, d => d.citations)])
         .range([0, chart_dimensions.height]);
+
     // Define the div for the tooltip
     var div = d3.select("body").append("div")
         .attr("class", "tooltip")
@@ -215,20 +215,26 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("width", canvas.width)
         .attr("height", canvas.height);
 
+
     const bar = chart.selectAll("g")
-        .data(referenceData)
+        .data(data)
         .enter().append("g")
         .attr("transform",
-            function (d, i) {
-                return "translate(" + (margin.left + (x_year.bandwidth() * i)) + ", " + margin.top + ")";
+            function (d) {
+                return "translate(" + (margin.left + (x_year(d.year))) + ", " + margin.top + ")";
             });
 
     bar.append("rect")
         .attr("class","bar-citations")
         .attr("width", x_year.bandwidth()/2-1)
-        .attr("height", function(d) { return y_citations(d.citations) })
+        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
         .attr("x",0)
-        .attr("y",function(d) { return chart_dimensions.height-y_citations(d.citations)})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].citationsBarHeight) {
+                referencesByYear[d.year].citationsBarHeight = 0;
+            }
+            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
+            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)})
         .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
@@ -246,9 +252,16 @@ d3.dsv(",", "./data.csv", function(d) {
     bar.append("rect")
         .attr("class","bar-papers")
         .attr("width", x_year.bandwidth()/2-1)
-        .attr("height", function(d) { return y_papers(d.papers)})
+        .attr("height", function(d) { return y_papers(1)+0.5})
         .attr("x",x_year.bandwidth()/2)
-        .attr("y",function(d) { return chart_dimensions.height-y_papers(d.papers)})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].paperBarHeight) {
+                referencesByYear[d.year].paperBarHeight = 0;
+            }
+            // console.log("Bar height for paper: " + y_papers(100));
+            referencesByYear[d.year].paperBarHeight += y_papers(1);
+            // console.log("Papers bar: " + (chart_dimensions.height-referencesByYear[d.year].paperBarHeight));
+            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight})
         .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
