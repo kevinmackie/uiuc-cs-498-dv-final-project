@@ -13,6 +13,22 @@ function frameBack() {
     toggleEnabled();
     state--;
 }
+
+typeMap = {
+    "Article": "red",
+    "Abstract Report": "green",
+    "Article in Press": "blue",
+    "Book": "yellow",
+    "Business Article": "orange",
+    "Conference Paper": "brown",
+    "Conference Review": "pink",
+    "Editorial" : "black",
+    "Note" : "black",
+    "Open Access" : "green",
+    "Review" : "white",
+    "Short Survey" : "white"
+}
+
 function toggleVisibility() {
     let className = "toggle-visibility-" + state;
 
@@ -36,7 +52,9 @@ d3.dsv(",", "./data.csv", function(d) {
 
     const dataobj = {
         year: +d.Year,
-        citations: +d["Cited by"]
+        citations: +d["Cited by"],
+        type: d.Source
+
     };
 
     if (!referencesByYear[dataobj.year])
@@ -50,7 +68,7 @@ d3.dsv(",", "./data.csv", function(d) {
 }).then(function(data) {
 
     const canvas = {width: 900, height: 500};
-    const margin = {top: 50, left: 50, bottom: 50, right: 50};
+    const margin = {top: 50, left: 150, bottom: 50, right: 50};
     const chart_dimensions = {
         width: canvas.width - (margin.left + margin.right),
         height: canvas.height - (margin.top + margin.bottom)
@@ -66,6 +84,29 @@ d3.dsv(",", "./data.csv", function(d) {
         .domain([1, d3.max(data, d => d.citations)])
         .range([0, chart_dimensions.height]);
 
+    var ordinal = d3.scaleOrdinal()
+        .domain(["Article", "Abstract Report","Article in Press","Book", "Business Article", "Conference Paper",
+            "Conference Review", "Editorial", "Note", "Open Access", "Review", "Short Survey"])
+        .range(["red","green","blue","yellow","orange","brown",
+            "pink", "black", "black", "green", "white", "white"]);
+
+
+    var svg = d3.select("svg");
+
+    svg.append("g")
+        .attr("class", "legendOrdinal")
+        .attr("transform", "translate("+ 20 + "," + (margin.top) + ")");
+
+    var legendOrdinal = d3.legendColor()
+        .shape("path", d3.symbol().size(100)())
+        .shapePadding(10)
+        .labelOffset(100)
+        //use cellFilter to hide the "e" cell
+        .cellFilter(function(d){ return d.label !== "e" })
+        .scale(ordinal);
+
+    svg.select(".legendOrdinal")
+        .call(legendOrdinal);
 
     // Define the div for the tooltip
     var div = d3.select("body").append("div")
@@ -75,7 +116,6 @@ d3.dsv(",", "./data.csv", function(d) {
     const chart = d3.select(".chart")
         .attr("width", canvas.width)
         .attr("height", canvas.height);
-
 
     const bar = chart.selectAll("g")
         .data(data)
@@ -96,10 +136,11 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("class","scatter-citations")
         .attr("cx",0)
         .attr("cy",0)
-        .attr("r",3)
-        .attr("stroke","orange")
+        .attr("r",5)
+        .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
+        .attr("stroke","black")
         .attr("fill","none")
-        .attr("stroke-width",2)
+        .attr("stroke-width", 2)
         .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
@@ -123,7 +164,7 @@ d3.dsv(",", "./data.csv", function(d) {
     d3.select("svg").append("g")
         .attr("id", "xAxisG")
         .attr("class", "x axis")
-        .attr("transform", "translate(" + (margin.left + (x_year.bandwidth()/2)) + "," + (margin.top + chart_dimensions.height) +")")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height) +")")
         .call(xAxisYear)
         .selectAll("text")
         .attr("x",-25)

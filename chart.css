@@ -84,6 +84,53 @@ footer {
 .attack {
     style: "color:red"
 }
+
+.type-category-color-article {
+    stroke: red;
+}
+
+.type-category-color-abstract-report {
+    stroke: lime;
+}
+
+.type-category-color-article-in-press {
+    stroke: navy;
+}
+
+.type-category-color-book {
+    stroke: orange;
+}
+
+.type-category-color-business-article {
+    stroke: yellow;
+}
+
+.type-category-color-conference-paper {
+    stroke: blue;
+}
+.type-category-color-conference-review {
+    stroke: magenta;
+}
+.type-category-color-editorial {
+    stroke: purple;
+}
+.type-category-color-note {
+    stroke: teal;
+}
+.type-category-color-open-access {
+    stroke: coral;
+}
+.type-category-color-review {
+    stroke: lavender;
+}
+.type-category-color-short-survey {
+    stroke: beige;
+}
+.type-category-color-unknown {
+    stroke: olive;
+}
+
+
 /* On small screens, set height to 'auto' for sidenav and grid */
 @media screen and (max-width: 767px) {
     .sidenav {

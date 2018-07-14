@@ -13,6 +13,11 @@ function frameBack() {
     toggleEnabled();
     state--;
 }
+
+function transition() {
+
+}
+
 function toggleVisibility() {
     let className = "toggle-visibility-" + state;
 
@@ -36,9 +41,11 @@ d3.dsv(",", "./data.csv", function(d) {
 
     const dataobj = {
         year: +d.Year,
-        citations: +d["Cited by"]
+        citations: +d["Cited by"],
+        type: d.Type
     };
 
+    console.log(d);
     if (!referencesByYear[dataobj.year])
         referencesByYear[dataobj.year] = { year: dataobj.year, papers: 0, citations: 0};
 
