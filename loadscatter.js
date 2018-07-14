@@ -84,14 +84,30 @@ d3.dsv(",", "./data.csv", function(d) {
         .domain([1, d3.max(data, d => d.citations)])
         .range([0, chart_dimensions.height]);
 
-    var ordinal = d3.scaleOrdinal()
-        .domain(["Article", "Abstract Report","Article in Press","Book", "Business Article", "Conference Paper",
-            "Conference Review", "Editorial", "Note", "Open Access", "Review", "Short Survey"])
-        .range(["red","green","blue","yellow","orange","brown",
-            "pink", "black", "black", "green", "white", "white"]);
+    // const ordinal = d3.scaleOrdinal()
+    //     .domain(["Article", "Abstract Report", "Article in Press", "Book", "Business Article", "Conference Paper",
+    //         "Conference Review", "Editorial", "Note", "Open Access", "Review", "Short Survey"])
+    //     .range(["red", "green", "blue", "yellow", "orange", "brown",
+    //         "pink", "black", "black", "green", "white", "white"]);
 
+    const typeSet = d3.set();
 
-    var svg = d3.select("svg");
+    d3.values(data).map(
+        function(d) {
+            typeSet.add(d.type);
+            return d;
+        });
+
+    const categoryContinuousColorScale = d3.scaleBand()
+        .domain(typeSet.values())
+        .range([0,350]);
+
+    const categoryDiscreteColorScale = d3.scaleOrdinal()
+        .domain(typeSet.values())
+        .range(typeSet.values().map(function(d) {
+            return "hsl( " + categoryContinuousColorScale(d) + ", 75%, 50%)"}));
+
+    const svg = d3.select("svg");
 
     svg.append("g")
         .attr("class", "legendOrdinal")
@@ -101,14 +117,11 @@ d3.dsv(",", "./data.csv", function(d) {
         .shape("path", d3.symbol().size(100)())
         .shapePadding(10)
         .labelOffset(100)
-        //use cellFilter to hide the "e" cell
-        .cellFilter(function(d){ return d.label !== "e" })
-        .scale(ordinal);
+        .scale(categoryDiscreteColorScale);
 
     svg.select(".legendOrdinal")
         .call(legendOrdinal);
 
-    // Define the div for the tooltip
     var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
@@ -126,7 +139,6 @@ d3.dsv(",", "./data.csv", function(d) {
                 if (d.citations > 0) {
                     y = y_citations(d.citations);
                 }
-
                 return "translate(" +
                     (margin.left + x_year(d.year)) + ", " +
                     (margin.top + (chart_dimensions.height - y)) + ")";
@@ -137,9 +149,10 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("cx",0)
         .attr("cy",0)
         .attr("r",5)
-        .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
-        .attr("stroke","black")
-        .attr("fill","none")
+        // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
+        .attr("stroke",function(d) { return categoryDiscreteColorScale(d.type); })
+        .attr("fill","black")
+        .attr("fill-opacity","0")
         .attr("stroke-width", 2)
         .on("mouseover", function(d) {
             div.transition()
