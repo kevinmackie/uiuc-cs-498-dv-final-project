@@ -1,25 +1,42 @@
 var referencesByYear = {};
 
-var state = 0;
+var frame = 1;
 
 
 function frameForward() {
-    state++;
+    frame++;
     toggleVisibility();
     toggleEnabled();
+    toggleActive();
 }
 function frameBack() {
     toggleVisibility();
     toggleEnabled();
-    state--;
+    toggleActive();
+    frame--;
+}
+function jumpToFrame( newFrame ) {
+    if (frame === newFrame) return;
+
+    const framesToJump = (newFrame - frame);
+
+    let reverse = (framesToJump < 0);
+
+    console.log("Frames to jump = " + framesToJump);
+    console.log("Reverse " + reverse);
+    console.log("Abs to jump " + Math.abs(framesToJump));
+    let i = 0;
+    for (i = 0; i < Math.abs(framesToJump); i++) {
+        if (reverse)
+            frameBack();
+        else
+            frameForward();
+    }
 }
 
-function transition() {
-
-}
 
 function toggleVisibility() {
-    let className = "toggle-visibility-" + state;
+    let className = "toggle-visibility-" + frame;
 
     var elements = document.getElementsByClassName(className);
 
@@ -28,7 +45,7 @@ function toggleVisibility() {
     }
 }
 function toggleEnabled() {
-    let className = "toggle-enabled-" + state;
+    let className = "toggle-enabled-" + frame;
 
     var elements = document.getElementsByClassName(className);
 
@@ -36,7 +53,15 @@ function toggleEnabled() {
         elements[i].classList.toggle("disabled")
     }
 }
+function toggleActive() {
+    let className = "toggle-active-" + frame;
 
+    var elements = document.getElementsByClassName(className);
+
+    for (i=0; i < elements.length; i++) {
+        elements[i].classList.toggle("active")
+    }
+}
 d3.dsv(",", "./data.csv", function(d) {
 
     const dataobj = {
@@ -45,7 +70,6 @@ d3.dsv(",", "./data.csv", function(d) {
         type: d.Type
     };
 
-    console.log(d);
     if (!referencesByYear[dataobj.year])
         referencesByYear[dataobj.year] = { year: dataobj.year, papers: 0, citations: 0};
 
@@ -57,7 +81,7 @@ d3.dsv(",", "./data.csv", function(d) {
 }).then(function(data) {
 
     const canvas = {width: 900, height: 500};
-    const margin = {top: 50, left: 50, bottom: 50, right: 50};
+    const margin = {top: 50, left: 50, bottom: 70, right: 50};
     const chart_dimensions = {
         width: canvas.width - (margin.left + margin.right),
         height: canvas.height - (margin.top + margin.bottom)
@@ -71,11 +95,19 @@ d3.dsv(",", "./data.csv", function(d) {
 
     const y_papers = d3.scaleLinear()
         .domain([0, d3.max(referenceData, d => d.papers)])
-        .range([0, chart_dimensions.height]);
+        .range([0,chart_dimensions.height]);
+
+    const y_papers_axis = d3.scaleLinear()
+        .domain([0, d3.max(referenceData, d => d.papers)])
+        .range([chart_dimensions.height,0]);
 
     const y_citations = d3.scaleLinear()
         .domain([0, d3.max(referenceData, d => d.citations)])
-        .range([0, chart_dimensions.height]);
+        .range([0,chart_dimensions.height]);
+
+    const y_citations_axis = d3.scaleLinear()
+        .domain([0, d3.max(referenceData, d => d.citations)])
+        .range([chart_dimensions.height,0]);
 
     // Define the div for the tooltip
     var div = d3.select("body").append("div")
@@ -265,9 +297,7 @@ d3.dsv(",", "./data.csv", function(d) {
             if (!referencesByYear[d.year].paperBarHeight) {
                 referencesByYear[d.year].paperBarHeight = 0;
             }
-            // console.log("Bar height for paper: " + y_papers(100));
             referencesByYear[d.year].paperBarHeight += y_papers(1);
-            // console.log("Papers bar: " + (chart_dimensions.height-referencesByYear[d.year].paperBarHeight));
             return chart_dimensions.height-referencesByYear[d.year].paperBarHeight})
         .on("mouseover", function(d) {
             div.transition()
@@ -290,22 +320,22 @@ d3.dsv(",", "./data.csv", function(d) {
         .call(makeAnnotations);
 
     const xAxisYear = d3.axisBottom().scale(x_year)
-        .tickSize(20).ticks(referenceData.length);
+        .tickSize(10).ticks(referenceData.length);
 
-    const yAxisPapers = d3.axisLeft().scale(y_papers)
+    const yAxisPapers = d3.axisLeft().scale(y_papers_axis)
         .tickSize(10).ticks(20);
 
-    const yAxisCitations = d3.axisRight().scale(y_citations)
+    const yAxisCitations = d3.axisRight().scale(y_citations_axis)
         .tickSize(10).ticks(20);
 
     d3.select("svg").append("g")
         .attr("id", "xAxisG")
         .attr("class", "x axis")
-        .attr("transform", "translate(" + (margin.left + (x_year.bandwidth()/2)) + "," + (margin.top + chart_dimensions.height) +")")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height) +")")
         .call(xAxisYear)
         .selectAll("text")
-        .attr("x",-25)
-        .attr("y",-x_year.bandwidth()/2)
+        .attr("x",-35)
+        .attr("y",0)
         .attr("dx",0)
         .attr("dy","0.35em")
         .attr("transform", "rotate(-90)")
@@ -314,18 +344,16 @@ d3.dsv(",", "./data.csv", function(d) {
     d3.select("svg").append("text")
         .attr("transform",
             "translate(" + (margin.left + chart_dimensions.width/2) + " ," +
-            (margin.top + chart_dimensions.height + 40) + ")")
+            (margin.top + chart_dimensions.height + 50) + ")")
         .style("text-anchor", "middle")
         .text("Year");
 
     d3.select("svg").append("g")
         .attr("id", "yAxisPapersG")
         .attr("class", "y axis papers")
-        .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height)
-            + ") scale(1,-1)")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")")
         .call(yAxisPapers)
         .selectAll("text")
-        .attr("transform","scale(1,-1)")
         .attr("x",-30)
         .attr("y",0)
         .attr("dx",0)
@@ -342,10 +370,9 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("id", "yAxisCitationsG")
         .attr("class", "y axis citations")
         .attr("transform", "translate(" + (margin.left + chart_dimensions.width) + "," +
-            (margin.top + chart_dimensions.height) + ") scale(1,-1)")
+            (margin.top) + ")")
         .call(yAxisCitations)
         .selectAll("text")
-        .attr("transform","scale(1,-1)")
         .attr("x",15)
         .attr("y",0)
         .attr("dx",0)
