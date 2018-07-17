@@ -1,6 +1,16 @@
-var referencesByYear = {};
+const canvas = {width: 900, height: 500};
+const margin = {top: 50, left: 50, bottom: 70, right: 50};
+const chart_dimensions = {
+    width: canvas.width - (margin.left + margin.right),
+    height: canvas.height - (margin.top + margin.bottom)
+};
+
+const referencesByYear = {};
 
 var frame = 1;
+
+var y_papers = d3.scaleLinear();
+var y_citations = d3.scaleLinear();
 
 function frameForward() {
     if (frame === 4) return;
@@ -80,11 +90,34 @@ var animateFunctions = [
 ];
 
 function animateScene2() {
-    console.log("Animate 2");
+    d3.selectAll(".bar-papers")
+        .transition()
+        .filter(function(d) { return (d.year > 2001)})
+        .duration(1000)
+        .delay(function(d) { return (d.year-2001)*10})
+        .attr("height",function(d) { return y_papers(1)+0.5})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].paperBarHeight) {
+                referencesByYear[d.year].paperBarHeight = 0;
+            }
+            referencesByYear[d.year].paperBarHeight += y_papers(1);
+            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
 }
 
 function animateScene3() {
-    console.log("Animate 3");
+    d3.selectAll(".bar-citations")
+        .transition()
+        .filter(function(d) { return (d.year > 2001)})
+        .delay(function(d) { return (d.year-2001)})
+        .duration(1000)
+        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].citationsBarHeight) {
+                referencesByYear[d.year].citationsBarHeight = 0;
+            }
+            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
+            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+
 }
 
 function deanimateScene2() {
@@ -112,12 +145,6 @@ d3.dsv(",", "./data.csv", function(d) {
 
 }).then(function(data) {
 
-    const canvas = {width: 900, height: 500};
-    const margin = {top: 50, left: 50, bottom: 70, right: 50};
-    const chart_dimensions = {
-        width: canvas.width - (margin.left + margin.right),
-        height: canvas.height - (margin.top + margin.bottom)
-    };
 
     const referenceData = d3.values(referencesByYear);
 
@@ -125,16 +152,14 @@ d3.dsv(",", "./data.csv", function(d) {
         .range([0, chart_dimensions.width])
         .domain(d3.keys(referencesByYear));
 
-    const y_papers = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, d => d.papers)])
+    y_papers.domain([0, d3.max(referenceData, d => d.papers)])
         .range([0,chart_dimensions.height]);
 
     const y_papers_axis = d3.scaleLinear()
         .domain([0, d3.max(referenceData, d => d.papers)])
         .range([chart_dimensions.height,0]);
 
-    const y_citations = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, d => d.citations)])
+    y_citations.domain([0, d3.max(referenceData, d => d.citations)])
         .range([0,chart_dimensions.height]);
 
     const y_citations_axis = d3.scaleLinear()
