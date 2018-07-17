@@ -2,19 +2,30 @@ var referencesByYear = {};
 
 var frame = 1;
 
-
 function frameForward() {
+    if (frame === 4) return;
     frame++;
     toggleVisibility();
     toggleEnabled();
     toggleActive();
+    animateScene( true );
 }
 function frameBack() {
+    if (frame === 1) return;
     toggleVisibility();
     toggleEnabled();
     toggleActive();
+    animateScene( false );
     frame--;
 }
+function animateScene( forward ) {
+    if (frame > (animateFunctions.length-1)) return;
+
+    const animateFunction = animateFunctions[frame][(forward?0:1)];
+    if (animateFunction)
+        animateFunction();
+}
+
 function jumpToFrame( newFrame ) {
     if (frame === newFrame) return;
 
@@ -33,8 +44,6 @@ function jumpToFrame( newFrame ) {
             frameForward();
     }
 }
-
-
 function toggleVisibility() {
     let className = "toggle-visibility-" + frame;
 
@@ -61,6 +70,29 @@ function toggleActive() {
     for (i=0; i < elements.length; i++) {
         elements[i].classList.toggle("active")
     }
+}
+var animateFunctions = [
+    [null, null],
+    [null, null],
+    [animateScene2,deanimateScene2],
+    [animateScene3,deanimateScene3],
+    [null,null]
+];
+
+function animateScene2() {
+    console.log("Animate 2");
+}
+
+function animateScene3() {
+    console.log("Animate 3");
+}
+
+function deanimateScene2() {
+    console.log("De-animate 2");
+}
+
+function deanimateScene3() {
+    console.log("De-nimate 3");
 }
 d3.dsv(",", "./data.csv", function(d) {
 
@@ -245,10 +277,10 @@ d3.dsv(",", "./data.csv", function(d) {
         }
     };
 
-    const makeAnnotations = d3.annotation()
-        .editMode(false)
-        .notePadding(15)
-        .annotations(d3.values(annotations));
+    // const makeAnnotations = d3.annotation()
+    //     .editMode(false)
+    //     .notePadding(15)
+    //     .annotations(d3.values(annotations));
 
     const chart = d3.select(".chart")
         .attr("width", canvas.width)
@@ -265,15 +297,41 @@ d3.dsv(",", "./data.csv", function(d) {
 
     bar.append("rect")
         .attr("class","bar-citations")
-        .attr("width", x_year.bandwidth()/2-1)
-        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
         .attr("x",0)
+        .attr("y",chart_dimensions.height)
+        .attr("width", x_year.bandwidth()/2-1)
+        .attr("height", 0)
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        })
+        .transition()
+        .filter(function(d) { return (d.year <= 2001)})
+        .delay(function(d) { if (d.year < 2002) return 0; else return (d.year-2001)})
+        .duration(1000)
+        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
         .attr("y",function(d) {
             if (!referencesByYear[d.year].citationsBarHeight) {
                 referencesByYear[d.year].citationsBarHeight = 0;
             }
             referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
-            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)})
+            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+
+    bar.append("rect")
+        .attr("class","bar-papers")
+        .attr("width", x_year.bandwidth()/2-1)
+        .attr("height", 0)
+        .attr("x",x_year.bandwidth()/2)
+        .attr("y",chart_dimensions.height)
         .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
@@ -284,40 +342,27 @@ d3.dsv(",", "./data.csv", function(d) {
         })
         .on("mouseout", function(d) {
             div.transition()
-                .duration(500)
+                .duration(1000)
                 .style("opacity", 0);
-        });
-
-    bar.append("rect")
-        .attr("class","bar-papers")
-        .attr("width", x_year.bandwidth()/2-1)
-        .attr("height", function(d) { return y_papers(1)+0.5})
-        .attr("x",x_year.bandwidth()/2)
+        })
+        .transition()
+        .filter(function(d) { return (d.year <= 2001)})
+        .duration(1000)
+        .delay(function(d) { if (d.year < 2002) return 0; else return (d.year-2001)*10})
+        .attr("height",function(d) { return y_papers(1)+0.5})
         .attr("y",function(d) {
             if (!referencesByYear[d.year].paperBarHeight) {
                 referencesByYear[d.year].paperBarHeight = 0;
             }
             referencesByYear[d.year].paperBarHeight += y_papers(1);
-            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight})
-        .on("mouseover", function(d) {
-            div.transition()
-                .duration(200)
-                .style("opacity", .9);
-            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
+            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
 
-    d3.select("svg")
-        .append("g")
-        .attr("class", "annotation-group")
-        .attr("transform","translate(" + margin.left + "," + margin.top + ")")
-        .call(makeAnnotations);
+
+    // d3.select("svg")
+    //     .append("g")
+    //     .attr("class", "annotation-group")
+    //     .attr("transform","translate(" + margin.left + "," + margin.top + ")")
+    //     .call(makeAnnotations);
 
     const xAxisYear = d3.axisBottom().scale(x_year)
         .tickSize(10).ticks(referenceData.length);

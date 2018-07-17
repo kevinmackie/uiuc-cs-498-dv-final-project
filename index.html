@@ -9,7 +9,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.0/d3-annotation.js"></script><link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="chart.css"/>
     <script type="text/javascript" src="loaddata.js"></script>
 </head>
@@ -28,14 +27,19 @@
     <div class="row">
         <div class="col-md-3">
             <p></p>
+            <button type="button" class="btn btn-default disabled toggle-enabled-2" onclick="frameBack()">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </button>
             <button type="button" class="btn btn-default active toggle-active-2" onclick="jumpToFrame(1)">1</button>
             <button type="button" class="btn btn-default toggle-active-2 toggle-active-3" onclick="jumpToFrame(2)">2</button>
             <button type="button" class="btn btn-default toggle-active-3 toggle-active-4" onclick="jumpToFrame(3)">3</button>
             <button type="button" class="btn btn-default toggle-active-4" onclick="jumpToFrame(4)">4</button>
-            <button type="button" class="btn btn-default" onclick="frameForward()">Next>></button>
+            <button type="button" class="btn btn-default toggle-active-4 toggle-enabled-4" onclick="frameForward()">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
         </div>
         <div class="col-md-7">
-            <div class="toggle-visibility-2"><h1>Papers Published Pre 2002</h1></div>
+            <div class="toggle-visibility-2"><h1 align="center">Papers Published Pre 2002</h1></div>
             <div class="invisible toggle-visibility-2 toggle-visibility-3"><h1>2002 and beyond</h1></div>
             <div class="invisible toggle-visibility-3 toggle-visibility-4"><h1>Citations</h1></div>
             <div class="invisible toggle-visibility-4"><h1>2010-2011 - What Happened?</h1></div>
@@ -46,9 +50,9 @@
     </div>
     <div class="row narrative">
         <div class="col-md-3">
-            <h3>Falling Short</h3>
             This website will allow you to learn about the research literature into SCADA cybersecurity. We start with an overview of the literature and then you will be allowed to explore the literature yourself.
             <div id="n-01" class="invisible toggle-visibility-1 toggle-visibility-2">
+                <h3>Falling Short</h3>
                 <p>In the 80s and 90s there is relatively little cybersecurity research. </p>
             </div>
             <div id="n-02" class="invisible toggle-visibility-2 toggle-visibility-3">
@@ -74,6 +78,9 @@
         </div>
         <div class="col-md-7">
             <svg class="chart"></svg>
+            <div class="annotation">
+                Test
+            </div>
         </div>
         <div class="col-md-2"></div>
     </div>
