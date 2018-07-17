@@ -86,7 +86,7 @@ var animateFunctions = [
     [null, null],
     [animateScene2,deanimateScene2],
     [animateScene3,deanimateScene3],
-    [null,null]
+    [animateScene4,null]
 ];
 
 function animateScene2() {
@@ -107,8 +107,7 @@ function animateScene2() {
 function animateScene3() {
     d3.selectAll(".bar-citations")
         .transition()
-        .filter(function(d) { return (d.year > 2001)})
-        .delay(function(d) { return (d.year-2001)})
+        .delay(function(d) { return (d.year-1980)})
         .duration(1000)
         .attr("height", function(d) { return y_citations(d.citations)+0.5;})
         .attr("y",function(d) {
@@ -117,6 +116,16 @@ function animateScene3() {
             }
             referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
             return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+
+}
+
+function animateScene4() {
+    d3.selectAll(".bar-papers")
+        .transition()
+        .duration(1000)
+        .delay(function(d) { return (d.year-2001)*10})
+        .attr("height",0)
+        .attr("y",chart_dimensions.height);
 
 }
 
@@ -339,17 +348,6 @@ d3.dsv(",", "./data.csv", function(d) {
                 .duration(500)
                 .style("opacity", 0);
         })
-        .transition()
-        .filter(function(d) { return (d.year <= 2001)})
-        .delay(function(d) { if (d.year < 2002) return 0; else return (d.year-2001)})
-        .duration(1000)
-        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
-        .attr("y",function(d) {
-            if (!referencesByYear[d.year].citationsBarHeight) {
-                referencesByYear[d.year].citationsBarHeight = 0;
-            }
-            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
-            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
 
     bar.append("rect")
         .attr("class","bar-papers")
@@ -395,6 +393,9 @@ d3.dsv(",", "./data.csv", function(d) {
     const yAxisPapers = d3.axisLeft().scale(y_papers_axis)
         .tickSize(10).ticks(20);
 
+    const yAxisPapers2 = d3.axisLeft().scale(d3.scaleLinear().domain([0,d3.max(referenceData,d=>d.year)]).range([1,0]))
+        .tickSize(10).ticks(20);
+
     const yAxisCitations = d3.axisRight().scale(y_citations_axis)
         .tickSize(10).ticks(20);
 
@@ -421,7 +422,13 @@ d3.dsv(",", "./data.csv", function(d) {
     d3.select("svg").append("g")
         .attr("id", "yAxisPapersG")
         .attr("class", "y axis papers")
-        .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height + margin.bottom) + ")")
+        .call(yAxisPapers);
+
+    d3.select("#yAxisPapersG")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .call(yAxisPapers)
         .selectAll("text")
         .attr("x",-30)
@@ -429,6 +436,7 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("dx",0)
         .attr("dy","0.35em")
         .style("text-anchor", "start");
+
 
     d3.select("svg").append("text")
         .attr("transform",
