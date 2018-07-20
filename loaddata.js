@@ -1,5 +1,5 @@
 const canvas = {width: 900, height: 500};
-const margin = {top: 50, left: 50, bottom: 70, right: 50};
+const margin = {top: 50, left: 50, bottom: 70, right: 70};
 const chart_dimensions = {
     width: canvas.width - (margin.left + margin.right),
     height: canvas.height - (margin.top + margin.bottom)
@@ -7,10 +7,12 @@ const chart_dimensions = {
 
 const referencesByYear = {};
 
-var frame = 1;
+let frame = 1;
 
-var y_papers = d3.scaleLinear();
-var y_citations = d3.scaleLinear();
+const y_papers = d3.scaleLinear();
+const y_citations = d3.scaleLinear();
+let yAxisCitations = d3.axisRight();
+let yAxisPapers = d3.axisLeft();
 
 function frameForward() {
     if (frame === 4) return;
@@ -105,6 +107,18 @@ function animateScene2() {
 }
 
 function animateScene3() {
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + (margin.left + chart_dimensions.width) + "," + margin.top + ")")
+        .call(yAxisCitations);
+
+    d3.select("#yAxisCitationsLabel")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + (margin.left + chart_dimensions.width + 52) + "," +
+            (margin.top + chart_dimensions.height/2) + "),rotate(-90)");
+
     d3.selectAll(".bar-citations")
         .transition()
         .delay(function(d) { return (d.year-1980)})
@@ -123,9 +137,39 @@ function animateScene4() {
     d3.selectAll(".bar-papers")
         .transition()
         .duration(1000)
-        .delay(function(d) { return (d.year-2001)*10})
-        .attr("height",0)
-        .attr("y",chart_dimensions.height);
+        .delay(function (d) {
+            return (d.year - 2001) * 10
+        })
+        .attr("height", 0)
+        .attr("y", chart_dimensions.height);
+
+    d3.select("#yAxisPapersG")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + (margin.left) + "," +
+            (margin.top + chart_dimensions.height + margin.bottom) + ")")
+        .call(yAxisPapers);
+
+    d3.select("#yAxisPapersLabel")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + margin.left + "," + (margin.top+chart_dimensions.height+2*margin.bottom) +
+        "), rotate(90)");
+
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .duration(1000)
+        .attr("transform","translate(" + (margin.left+chart_dimensions.width) + ", " +
+            (margin.top+chart_dimensions.height+margin.bottom)+")");
+
+    d3.selectAll(".bar-citations")
+        .transition()
+        .duration(1000)
+        .delay(function (d) {
+            return (d.year - 2001) * 10
+        })
+        .attr("height", 0)
+        .attr("y", chart_dimensions.height);
 
 }
 
@@ -380,23 +424,13 @@ d3.dsv(",", "./data.csv", function(d) {
             referencesByYear[d.year].paperBarHeight += y_papers(1);
             return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
 
-
-    // d3.select("svg")
-    //     .append("g")
-    //     .attr("class", "annotation-group")
-    //     .attr("transform","translate(" + margin.left + "," + margin.top + ")")
-    //     .call(makeAnnotations);
-
     const xAxisYear = d3.axisBottom().scale(x_year)
         .tickSize(10).ticks(referenceData.length);
 
-    const yAxisPapers = d3.axisLeft().scale(y_papers_axis)
+    yAxisPapers.scale(y_papers_axis)
         .tickSize(10).ticks(20);
 
-    const yAxisPapers2 = d3.axisLeft().scale(d3.scaleLinear().domain([0,d3.max(referenceData,d=>d.year)]).range([1,0]))
-        .tickSize(10).ticks(20);
-
-    const yAxisCitations = d3.axisRight().scale(y_citations_axis)
+    yAxisCitations.scale(y_citations_axis)
         .tickSize(10).ticks(20);
 
     d3.select("svg").append("g")
@@ -425,6 +459,14 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisPapers);
 
+    d3.select("svg").append("text")
+        .attr("id","yAxisPapersLabel")
+        .attr("transform",
+            "translate(8," + (margin.top + chart_dimensions.height + margin.bottom + chart_dimensions.height/2) + ")" +
+            ", rotate(-90)")
+        .style("text-anchor", "middle")
+        .text("Papers");
+
     d3.select("#yAxisPapersG")
         .transition()
         .duration(1000)
@@ -437,18 +479,18 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("dy","0.35em")
         .style("text-anchor", "start");
 
-
-    d3.select("svg").append("text")
+    d3.select("#yAxisPapersLabel")
+        .transition()
+        .duration(1000)
         .attr("transform",
-            "translate(8," + (margin.top + chart_dimensions.height/2) + "),rotate(-90)")
-        .style("text-anchor", "middle")
-        .text("Papers");
+            "translate(8," + (margin.top + chart_dimensions.height/2) + ")" +
+            ", rotate(-90)");
 
     d3.select("svg").append("g")
         .attr("id", "yAxisCitationsG")
         .attr("class", "y axis citations")
-        .attr("transform", "translate(" + (margin.left + chart_dimensions.width) + "," +
-            (margin.top) + ")")
+        .attr("transform", "translate(" + (8+ margin.left + chart_dimensions.width) + "," +
+            (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisCitations)
         .selectAll("text")
         .attr("x",15)
@@ -458,9 +500,10 @@ d3.dsv(",", "./data.csv", function(d) {
         .style("text-anchor", "start");
 
     d3.select("svg").append("text")
+        .attr("id","yAxisCitationsLabel")
         .attr("transform",
-            "translate(" + (margin.left + chart_dimensions.width + 42) + ","
-            + (margin.top + chart_dimensions.height/2) + "),rotate(90)")
+            "translate(" + (margin.left + chart_dimensions.width + 50) + ","
+            + ((margin.top + chart_dimensions.height + margin.bottom) + chart_dimensions.height/2) + "),rotate(-90)")
         .style("text-anchor", "middle")
         .text("Citations");
 
