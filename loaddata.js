@@ -11,8 +11,13 @@ let frame = 1;
 
 const y_papers = d3.scaleLinear();
 const y_citations = d3.scaleLinear();
+const y_citations_single = d3.scaleLog();
+
 let yAxisCitations = d3.axisRight();
 let yAxisPapers = d3.axisLeft();
+let dataSet;
+let x_year = d3.scaleBand();
+
 
 function frameForward() {
     if (frame === 4) return;
@@ -171,6 +176,23 @@ function animateScene4() {
         .attr("height", 0)
         .attr("y", chart_dimensions.height);
 
+    d3.selectAll(".circle-citations")
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .attr("cx",x_year.bandwidth()/2)
+        .attr("cy",function(d) {
+            if (d.citations === 0)
+                return chart_dimensions.height;
+            else
+                return (chart_dimensions.height-y_citations_single(d.citations)) })
+        .attr("r",5)
+        // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
+        .attr("stroke","red") //function(d) { return categoryDiscreteColorScale(d.type); })
+        .attr("fill","black")
+        .attr("fill-opacity","0")
+        .attr("stroke-width", 2);
+
 }
 
 function deanimateScene2() {
@@ -198,11 +220,11 @@ d3.dsv(",", "./data.csv", function(d) {
 
 }).then(function(data) {
 
+    dataSet = data;
 
     const referenceData = d3.values(referencesByYear);
 
-    const x_year = d3.scaleBand()
-        .range([0, chart_dimensions.width])
+    x_year.range([0, chart_dimensions.width])
         .domain(d3.keys(referencesByYear));
 
     y_papers.domain([0, d3.max(referenceData, d => d.papers)])
@@ -218,6 +240,9 @@ d3.dsv(",", "./data.csv", function(d) {
     const y_citations_axis = d3.scaleLinear()
         .domain([0, d3.max(referenceData, d => d.citations)])
         .range([chart_dimensions.height,0]);
+
+    y_citations_single.domain([1, d3.max(data, d => d.citations)])
+        .range([0, chart_dimensions.height]);
 
     // Define the div for the tooltip
     var div = d3.select("body").append("div")
@@ -364,7 +389,6 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("width", canvas.width)
         .attr("height", canvas.height);
 
-
     const bar = chart.selectAll("g")
         .data(data)
         .enter().append("g")
@@ -423,6 +447,30 @@ d3.dsv(",", "./data.csv", function(d) {
             }
             referencesByYear[d.year].paperBarHeight += y_papers(1);
             return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
+
+    bar.append("circle")
+        .attr("class","circle-citations")
+        .attr("cx",0)
+        .attr("cy",0)
+        .attr("r",0)
+        // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
+        .attr("stroke","red") //function(d) { return categoryDiscreteColorScale(d.type); })
+        .attr("fill","black")
+        .attr("fill-opacity","1")
+        .attr("stroke-width", 0)
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
     const xAxisYear = d3.axisBottom().scale(x_year)
         .tickSize(10).ticks(referenceData.length);
