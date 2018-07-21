@@ -486,7 +486,7 @@ d3.dsv(",", "./data.csv", function(d) {
     bar.append("circle")
         .attr("class","circle-citations")
         .attr("cx",0)
-        .attr("cy",0)
+        .attr("cy",chart_dimensions.height)
         .attr("r",0)
         // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
         .attr("stroke",function(d) { return categoryDiscreteColorScale(d.type); })
