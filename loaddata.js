@@ -1,3 +1,4 @@
+
 const canvas = {width: 900, height: 500};
 const margin = {top: 50, left: 50, bottom: 70, right: 70};
 const chart_dimensions = {
@@ -12,11 +13,13 @@ let frame = 1;
 const y_papers = d3.scaleLinear();
 const y_citations = d3.scaleLinear();
 const y_citations_single = d3.scaleLog();
+const y_citations_single_axis = d3.scaleLog();
 
-let yAxisCitations = d3.axisRight();
-let yAxisPapers = d3.axisLeft();
+const yAxisCitations = d3.axisRight();
+const yAxisPapers = d3.axisLeft();
+const x_year = d3.scaleBand();
+
 let dataSet;
-let x_year = d3.scaleBand();
 
 
 function frameForward() {
@@ -161,12 +164,6 @@ function animateScene4() {
         .attr("transform", "translate(" + margin.left + "," + (margin.top+chart_dimensions.height+2*margin.bottom) +
         "), rotate(90)");
 
-    d3.select("#yAxisCitationsG")
-        .transition()
-        .duration(1000)
-        .attr("transform","translate(" + (margin.left+chart_dimensions.width) + ", " +
-            (margin.top+chart_dimensions.height+margin.bottom)+")");
-
     d3.selectAll(".bar-citations")
         .transition()
         .duration(1000)
@@ -187,11 +184,23 @@ function animateScene4() {
             else
                 return (chart_dimensions.height-y_citations_single(d.citations)) })
         .attr("r",5)
-        // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
-        .attr("stroke","red") //function(d) { return categoryDiscreteColorScale(d.type); })
         .attr("fill","black")
         .attr("fill-opacity","0")
         .attr("stroke-width", 2);
+
+    yAxisCitations.scale(y_citations_single_axis);
+
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .call(yAxisCitations.tickFormat(d3.format("d")))
+        .selectAll("text")
+        .attr("x",15)
+        .attr("y",0)
+        .attr("dx",0)
+        .attr("dy","0.35em")
+        .style("text-anchor", "start");
 
 }
 
@@ -207,7 +216,7 @@ d3.dsv(",", "./data.csv", function(d) {
     const dataobj = {
         year: +d.Year,
         citations: +d["Cited by"],
-        type: d.Type
+        type: d.Source
     };
 
     if (!referencesByYear[dataobj.year])
@@ -243,6 +252,32 @@ d3.dsv(",", "./data.csv", function(d) {
 
     y_citations_single.domain([1, d3.max(data, d => d.citations)])
         .range([0, chart_dimensions.height]);
+
+    y_citations_single_axis.domain([1, d3.max(data, d => d.citations)])
+        .range([chart_dimensions.height,0]);
+
+    const typeSet = d3.set();
+
+    console.log(data);
+
+    d3.values(data).map(
+        function(d) {
+            typeSet.add(d.type);
+            return d;
+        });
+
+    console.log(typeSet);
+
+    const categoryContinuousColorScale = d3.scaleBand()
+        .domain(typeSet.values())
+        .range([0,350]);
+
+    const categoryDiscreteColorScale = d3.scaleOrdinal()
+        .domain(typeSet.values())
+        .range(typeSet.values().map(function(d) {
+            return "hsl( " + categoryContinuousColorScale(d) + ", 75%, 50%)"}));
+
+
 
     // Define the div for the tooltip
     var div = d3.select("body").append("div")
@@ -454,7 +489,7 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("cy",0)
         .attr("r",0)
         // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
-        .attr("stroke","red") //function(d) { return categoryDiscreteColorScale(d.type); })
+        .attr("stroke",function(d) { return categoryDiscreteColorScale(d.type); })
         .attr("fill","black")
         .attr("fill-opacity","1")
         .attr("stroke-width", 0)
