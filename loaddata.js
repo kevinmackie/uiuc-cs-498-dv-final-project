@@ -19,8 +19,9 @@ const yAxisCitations = d3.axisRight();
 const yAxisPapers = d3.axisLeft();
 const x_year = d3.scaleBand();
 
+let annotationDiv;
 let dataSet;
-
+let svg;
 
 function frameForward() {
     if (frame === 4) return;
@@ -53,9 +54,6 @@ function jumpToFrame( newFrame ) {
 
     let reverse = (framesToJump < 0);
 
-    console.log("Frames to jump = " + framesToJump);
-    console.log("Reverse " + reverse);
-    console.log("Abs to jump " + Math.abs(framesToJump));
     let i = 0;
     for (i = 0; i < Math.abs(framesToJump); i++) {
         if (reverse)
@@ -112,6 +110,46 @@ function animateScene2() {
             }
             referencesByYear[d.year].paperBarHeight += y_papers(1);
             return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
+
+    // Figure out the aiming point of the annotation line
+    const svgX = x_year(2001);
+    const svgY = (margin.top + chart_dimensions.height - 200); // todo: change bar charts to single rect and use value of point for Y too
+
+    // Figure out where to position the annotation text, relative to the aiming point
+    const dx = 0;
+    const dy = -50;
+
+    // const svg = $('.chart')[0];
+    //
+    // const svgPoint = svg.createSVGPoint();
+    // svgPoint.x = svgX;
+    // svgPoint.y = svgY;
+    //
+    // const m = svgPoint.matrixTransform(svg.getScreenCTM());
+    //
+
+    const annotationGroup = document.getElementById("annotation-group-9-11");
+    const annotationText = document.getElementById("annotation-text-9-11");
+    const annotationTextDimensions = annotationText.getBoundingClientRect();
+
+    d3.select("#annotation-line-9-11")
+        .transition()
+        .duration(1000)
+        .attr("display","block")
+        .attr("x1",(svgX+dx+annotationTextDimensions.width/2))
+        .attr("y1",(svgY+dy+annotationTextDimensions.height/2))
+        .attr("x2",(svgX+margin.left+x_year.bandwidth()/2))
+        .attr("y2",(margin.top+chart_dimensions.height-20));
+
+    d3.select("#annotation-group-9-11")
+        .transition()
+        .duration(1000)
+        .attr("display","block");
+
+    d3.select("#annotation-text-9-11")
+        .transition()
+        .attr("transform","translate(" + (svgX+dx) + "," + (svgY+dy) + ")");
+
 }
 
 function animateScene3() {
@@ -162,7 +200,7 @@ function animateScene4() {
         .transition()
         .duration(1000)
         .attr("transform", "translate(" + margin.left + "," + (margin.top+chart_dimensions.height+2*margin.bottom) +
-        "), rotate(90)");
+            "), rotate(90)");
 
     d3.selectAll(".bar-citations")
         .transition()
@@ -258,15 +296,11 @@ d3.dsv(",", "./data.csv", function(d) {
 
     const typeSet = d3.set();
 
-    console.log(data);
-
     d3.values(data).map(
         function(d) {
             typeSet.add(d.type);
             return d;
         });
-
-    console.log(typeSet);
 
     const categoryContinuousColorScale = d3.scaleBand()
         .domain(typeSet.values())
@@ -279,8 +313,11 @@ d3.dsv(",", "./data.csv", function(d) {
 
 
 
-    // Define the div for the tooltip
-    var div = d3.select("body").append("div")
+    // Define the div for the tooltips amd annotations
+    annotationDiv = d3.select("body").append("div")
+        .attr("class", "annotation")
+        .style("opacity", 0);
+    var tooltipDiv = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
@@ -414,12 +451,17 @@ d3.dsv(",", "./data.csv", function(d) {
             subject: { radius: 20, radiusPadding: 5 }
         }
     };
-
-    // const makeAnnotations = d3.annotation()
-    //     .editMode(false)
-    //     .notePadding(15)
-    //     .annotations(d3.values(annotations));
-
+    // const annotationsValues = d3.values(annotations);
+    // const annotationBody = d3.select("body");
+    // let i = 0;
+    // for (i = 0; i < annotationsValues.length; i++) {
+    //     const annotation = annotationsValues[i];
+    //     annotationBody.append("div")
+    //         .attr("class","tooltip toggle-visibility-2")
+    //         .attr("opacity",0)
+    //         .html("<p>This is a test of the annotation</p>");
+    //
+    // }
     const chart = d3.select(".chart")
         .attr("width", canvas.width)
         .attr("height", canvas.height);
@@ -439,18 +481,20 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("width", x_year.bandwidth()/2-1)
         .attr("height", 0)
         .on("mouseover", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
+            tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
+
+
         })
         .on("mouseout", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(500)
                 .style("opacity", 0);
-        })
+        });
 
     bar.append("rect")
         .attr("class","bar-papers")
@@ -459,15 +503,15 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("x",x_year.bandwidth()/2)
         .attr("y",chart_dimensions.height)
         .on("mouseover", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
+            tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         })
         .on("mouseout", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(1000)
                 .style("opacity", 0);
         })
@@ -494,15 +538,15 @@ d3.dsv(",", "./data.csv", function(d) {
         .attr("fill-opacity","1")
         .attr("stroke-width", 0)
         .on("mouseover", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
+            tooltipDiv	.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations )
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         })
         .on("mouseout", function(d) {
-            div.transition()
+            tooltipDiv.transition()
                 .duration(500)
                 .style("opacity", 0);
         });
@@ -596,4 +640,6 @@ d3.dsv(",", "./data.csv", function(d) {
             + (margin.top/2) + ")")
         .style("text-anchor", "middle")
         .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
+
+
 });

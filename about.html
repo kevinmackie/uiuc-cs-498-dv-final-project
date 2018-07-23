@@ -4,21 +4,6 @@
 </head>
 
 <body>
-
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="start">KM</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li><a href="Start">Start</a></li>
-      <li class="active"><a href="about">About</a></li>
-      <li><a href="#">Overview</a></li>
-      <li><a href="#">Themes, Authors</a></li>
-    </ul>
-  </div>
-</nav>
-
 <div class="container">
   <h1 align="left">About the Visualization</h1>
 
@@ -26,34 +11,53 @@
     annotations, parameters, and triggers, as described below</p>
 
   <h2>Hybrid Structure</h2>
-  The narrative visualization should follow one of the three hybrid structures: a martini glass,
-  an interactive slideshow, or a drill down story.
+  This narrative visualization follows a "martini glass" hybrid structure consisting of three author-drive
+  scenes followed by a final scene in which the read is allowed to explore the literature in an open-ended manner.
   <h2>Scenes</h2>
-  The scenes follow a template for consistency, follow an order to best convey the
-  message.
+  The three author-driven scenes follow an identical layout to keep the user from becoming confused in the
+  transition between scenes. Transition animation is used to both maintain reader engagement and to orient
+  the reader during changes between scenes.
+
   <h3>Scene Layout and Visual Structure</h3>
-  Discussion of layout and any visual structure of these scenes.
-  <h3>Overview of Scenes</h3>
-  <p><b>First scene</b> - shows an overview of SCADA cybersecurity research.</p>
-  Annotations are used to overlay key security and cybersecurity events onto the graph, to help suggest reasons
-  for the pattern of papers and citations.
-  <p><b>Second scene</b> - shows research themes and how they have developed over time.</p>
-  <p><b>Third scene</b> - shows key authors, institutions, related to the theme of viruses.</p>
-  <p><b>Fourth scene</b> - shows the most influential papers related to viruses in SCADA cybersecurity</p>
+  <p>Scenes are templated for consistency and arranged to draw attention to the central chart, which is framed by
+  a large thematic title and explanatory sidebar. Page buttons and left and right arrows are used to transition
+    between scenes (or to jump to a particular scene).</p>
+  <p></p>
   <h2>Annotations</h2>
-  The annotations should follow a template for visual consistency, should highlight specific data
-  items or trends, and the essay should indicate when they are cleared.
-  Annotations are used on scene 1 to show salient characteristics in the data:
-  <li>Increase in research around 2002</li>
-  <li>Increase in citations around 2010</li>
-  <li>Decrease in citations around 2013</li>
+  Annotations are placed on the chart to highlight key points and trends in the data. They are implemented
+  in a visually consistent manner. Annotations appear in the scene to which they relate, and then disappear
+  when the user advanced to the next scene to prevent the chart from becoming cluttered and to allow
+  focus on the next point in the story.
   <h2>Parameters</h2>
-  The parameters should be identified in the essay, which should also discuss the states of the
+  The key parameter during the initial author-drive scenes is the scene number, which determines the title and sidebar
+  text and the visible elements on the chart: axes, data items, annotations.
+  In the final reader-driven scene, the parameters are:
+  - Year axis range
+  - Citation range
+  - Category
+
+    The parameters should be identified in the essay, which should also discuss the states of the
   narrative visualization.
   <h2>Triggers</h2>
   The triggers should also be identified in the essay, in terms of the events and the parameter
   changes they trigger. User interface events should be listed, along with a description of how
   possible user events are communicated to the viewer.
+  - Page load sets up the first scene and "starts" the state machine in the initial state
+  - Advancing to the next scene triggers a change in title and sidebar, as well as transition animations and
+  annotations to highlight the story being told in that scene
+  - Mouse over events on the chart trigger a tooltip showing drill down details
+  - Clicking the last chart selects the papers at the point on the graph
+  - selected papers are identified by their coordinates (year, citations)
+  - Clicking and dragging on the chart filters the axes (year and citations) and is the same as clicking but
+  over a wider axis range
+  - Mousing over a legend label highlights data in that category (by desaturating and lowering the brightness
+  over other data values)
+  - Clicking a legend label selects or deselects that category
+  -
+  - Left and right arrows become enabled depending on state
+  - As the scene increments, elements on the page become visible (or invisible), and enabled (or disabled) as appropriate
+  to the current state of the visualization
+
 </div>
 </body>
 </html>

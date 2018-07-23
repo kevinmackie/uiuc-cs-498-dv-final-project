@@ -21,7 +21,7 @@
             <h3>Research on SCADA Cybersecurity</h3>
             This is a test of the text
         </div>
-        <div class="col-md-4" align="right"><p></p><p><a type="button" class="btn btn-default" href="/about" role="button" target="_blank">About the Visualization</a></p>
+        <div class="col-md-4" align="right"><p></p><p><a type="button" class="btn btn-default" href="about.html" role="button" target="_blank">About the Visualization</a></p>
         </div>
     </div>
     <div class="row">
@@ -66,7 +66,7 @@
                 <p>The trend shows an abrupt increase in SCADA cybersecurity reserach following the attacks of
                     9-11. Correlation does not imply causation, and more detailed research would be needed to
                     know what effect the terrorists attacks had on the volume of security research.
-                    </p>
+                </p>
             </div>
             <div id="n-03" class="invisible toggle-visibility-3 toggle-visibility-4">
                 <h3>Research Citations</h3>
@@ -77,7 +77,7 @@
                 </p>
                 <p>We also see an interesting jump in research citations in the 2010-2011 timeframe.</p>
                 <p>We now proceed to the interactive portion of the presentation, where you will be able
-                to drill down into further details into the SCADA cybersecurity research data.</p>
+                    to drill down into further details into the SCADA cybersecurity research data.</p>
             </div>
             <div id="n-04" class="invisible toggle-visibility-4 toggle-visibility-5">
                 <p>The graph below shows all of the papers on Scopus related to "SCADA" and "cybersecurity", number of
@@ -94,7 +94,44 @@
 
         </div>
         <div class="col-md-7">
-            <svg class="chart"></svg>
+            <svg class="chart">
+                <g id="annotation-group-pre-9-11" display="none">
+                    <line id="annotation-line-pre-9-11" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
+                    <g id="annotation-text-pre-9-11" transform="translate(200,100)">
+                        <rect height="5em" width="10em" fill="lightgrey"></rect>
+                        <text id="annotation-9-11" class="annotation" text-anchor="start">
+                            <tspan text-anchor="start" x="10" y="20">Up to 2002:</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">Small and slightly  </tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">growing body of     </tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">research.           </tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="annotation-group-9-11" display="none">
+                    <line id="annotation-line-9-11" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
+                    <g id="annotation-text-9-11" transform="translate(200,100)">
+                        <rect height="5em" width="10em" fill="lightgrey"></rect>
+                        <text id="annotation-9-11" class="annotation" text-anchor="start">
+                            <tspan text-anchor="start" x="10" y="20">September 11th Attack:</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">Abrupt increase in number of </tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">papers published. Steady</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">increase since then.</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="annotation-group-citations" display="none">
+                    <line id="annotation-line-citations" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
+                    <g id="annotation-text-citations" transform="translate(200,100)">
+                        <rect height="5em" width="10em" fill="lightgrey"></rect>
+                        <text id="annotation-9-11" class="annotation" text-anchor="start">
+                            <tspan text-anchor="start" x="10" y="20">Citations have kept pace at</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">about 10-20 to 1. Drop-off in</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">2012 suggests it takes about</tspan>
+                            <tspan text-anchor="start" x="10" dy="1.25em">5 years to disseminate research</tspan>
+                        </text>
+                    </g>
+                </g>
+            </svg>
         </div>
         <div class="col-md-2"></div>
     </div>
