@@ -109,21 +109,21 @@ function removeAnnotation( annotationName ) {
 
     d3.selectAll("." + lineClass)
         .transition()
-        .duration(500)
+        .duration(750)
         .attr("opacity",0)
         .remove();
 
     d3.select("#" + rectName)
         .transition()
         .delay(250)
-        .duration(250)
+        .duration(500)
         .attr("opacity",0)
         .remove();
 
     d3.selectAll("." + tspanClass)
         .transition()
         .delay(250)
-        .duration(250)
+        .duration(500)
         .attr("opacity",0)
         .remove();
 
@@ -297,7 +297,9 @@ function animateScene2() {
 function animateScene3() {
     removeAnnotation("scene-1");
     removeAnnotation("scene-2");
-    insertAnnotation("scene-3");
+    insertAnnotation("scene-3a");
+    insertAnnotation("scene-3b");
+    insertAnnotation("scene-3c");
 
     d3.select("#yAxisCitationsG")
         .transition()
@@ -359,6 +361,10 @@ function animateScene3() {
 }
 
 function animateScene4() {
+    removeAnnotation("scene-3a");
+    removeAnnotation("scene-3b");
+    removeAnnotation("scene-3c");
+
     d3.selectAll(".bar-papers")
         .transition()
         .duration(1000)

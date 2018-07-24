@@ -27,26 +27,43 @@ const annotations = {
                 }
             ]
         },
-    "scene-3":
+    "scene-3a":
         {
-            text: ["Citations have kept pace at", "about 10-20 to 1. Drop-off in", "2012 suggests it takes about", "5 years to disseminate research"],
+            text: ["Citations have kept pace", "at about 10-20 to 1."],
             textCenter: {
-                year: 2003,
-                papers: 200
+                year: 1999,
+                papers: 110
             },
             aimingPoints: [
                 {
                     year: 2004,
                     papers: 60
-                },
-                {
-                    year: 2012,
-                    papers: 120
-                },
-                {
-                    year: 2010,
-                    papers: 212
                 }
             ]
+        },
+    "scene-3b": {
+        text: ["Drop-off in citations in 2012",
+               "suggests that it takes 5+ years",
+               "for the effect of research to be felt"],
+        textCenter: {
+            year: 2003,
+            papers: 170
+        },
+        aimingPoints: [{
+            year: 2012,
+            papers: 120
         }
-};
+        ]
+    },
+    "scene-3c": {
+        text: ["Large spike in 2010-2011. Why?", "We'll explore that next scene."],
+        textCenter: {
+            year: 1997,
+            papers: 212
+        },
+        aimingPoints: [{
+            year: 2010,
+            papers: 212
+        }]
+    }
+}
