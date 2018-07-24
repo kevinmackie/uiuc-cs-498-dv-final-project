@@ -10,6 +10,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
     <link rel="stylesheet" type="text/css" href="chart.css"/>
+    <script type="text/javascript" src="annotations.js"></script>
     <script type="text/javascript" src="loaddata.js"></script>
 </head>
 
@@ -94,43 +95,7 @@
 
         </div>
         <div class="col-md-7">
-            <svg class="chart">
-                <g id="annotation-group-pre-9-11" display="none">
-                    <line id="annotation-line-pre-9-11" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
-                    <g id="annotation-text-pre-9-11" transform="translate(200,100)">
-                        <rect height="5em" width="10em" fill="lightgrey"></rect>
-                        <text id="annotation-9-11" class="annotation" text-anchor="start">
-                            <tspan text-anchor="start" x="10" y="20">Up to 2002:</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">Small and slightly  </tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">growing body of     </tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">research.           </tspan>
-                        </text>
-                    </g>
-                </g>
-                <g id="annotation-group-9-11" display="none">
-                    <line id="annotation-line-9-11" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
-                    <g id="annotation-text-9-11" transform="translate(200,100)">
-                        <rect height="5em" width="10em" fill="lightgrey"></rect>
-                        <text id="annotation-9-11" class="annotation" text-anchor="start">
-                            <tspan text-anchor="start" x="10" y="20">September 11th Attack:</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">Abrupt increase in number of </tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">papers published. Steady</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">increase since then.</tspan>
-                        </text>
-                    </g>
-                </g>
-                <g id="annotation-group-citations" display="none">
-                    <line id="annotation-line-citations" x1="0" y1="0" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:0.5px"></line>
-                    <g id="annotation-text-citations" transform="translate(200,100)">
-                        <rect height="5em" width="10em" fill="lightgrey"></rect>
-                        <text id="annotation-9-11" class="annotation" text-anchor="start">
-                            <tspan text-anchor="start" x="10" y="20">Citations have kept pace at</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">about 10-20 to 1. Drop-off in</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">2012 suggests it takes about</tspan>
-                            <tspan text-anchor="start" x="10" dy="1.25em">5 years to disseminate research</tspan>
-                        </text>
-                    </g>
-                </g>
+            <svg id="chart-id" class="chart">
             </svg>
         </div>
         <div class="col-md-2"></div>

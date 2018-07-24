@@ -1,4 +1,3 @@
-
 const canvas = {width: 900, height: 500};
 const margin = {top: 50, left: 50, bottom: 70, right: 70};
 const chart_dimensions = {
@@ -8,7 +7,7 @@ const chart_dimensions = {
 
 const referencesByYear = {};
 
-let frame = 1;
+let frame = 0;
 
 const y_papers = d3.scaleLinear();
 const y_citations = d3.scaleLinear();
@@ -91,13 +90,123 @@ function toggleActive() {
 }
 var animateFunctions = [
     [null, null],
-    [null, null],
+    [animateScene1, null],
     [animateScene2,deanimateScene2],
     [animateScene3,deanimateScene3],
     [animateScene4,null]
 ];
 
+function animateScene1() {
+    insertAnnotation( "scene-1" )
+}
+function insertAnnotation( annotationName ) {
+
+    const rectName = "annotation-rect-" + annotationName;
+    const textName = "annotation-text-" + annotationName;
+    const lineSetName = "annotation-lines-" + annotationName;
+    const lineClass = "annotation-line-" + annotationName;
+    const tspanClass = "annotation-tspan-" + annotationName;
+
+    const annotation = annotations[annotationName];
+    // First add the text lines to the graph so we can calculate the geometry
+    // of it
+    d3.select(".chart")
+        .append("text")
+        .attr("id",textName)
+        .selectAll("tspan").data(annotation.text)
+        .enter()
+        .append("tspan")
+        .attr("class",tspanClass)
+        .attr("opacity",0)
+        .attr("text-anchor","start")
+        .attr("x",10)
+        .attr("y",function(d,i) { return (i*15) })
+        .text(function(d,i) { return annotation.text[i]});
+
+    // Now calculate the bounding rectangle of this text area
+    const annotationText = document.getElementById(textName);
+    const SVGRect = annotationText.getBBox();
+    const rectDimensions = {
+        height: (10 + SVGRect.height + 10),
+        width: (10 + SVGRect.width + 10)
+    };
+    const textBlockDimensions = annotationText.getBoundingClientRect();
+
+    // Remove the text, as we will want to add it in a different order so that z layering works
+    d3.select("#"+textName).remove();
+
+    const textBlockTopLeft = {
+        x: (margin.left+x_year(annotation.textCenter.year)-textBlockDimensions.width/2),
+        y: (margin.top+chart_dimensions.height-y_papers(annotation.textCenter.papers)+textBlockDimensions.height/2)
+    };
+
+    const lineStartingPoint = {
+        x: (textBlockTopLeft.x + (textBlockDimensions.width/2)),
+        y: (textBlockTopLeft.y + (textBlockDimensions.height/2))
+    };
+
+    d3.select(".chart")
+        .append("g")
+        .attr("id",lineSetName)
+        .selectAll("line").data(annotation.aimingPoints)
+        .enter()
+        .append("line")
+        .attr("class",lineClass)
+        .attr("opacity",0)
+        .attr("style","stroke:rgb(0,0,0);stroke-width:0.5px")
+        .attr("x1",lineStartingPoint.x)
+        .attr("y1",lineStartingPoint.y)
+        .attr("x2",function(d,i) {
+            return (margin.left + x_year(annotation.aimingPoints[i].year));
+        })
+        .attr("y2",function(d,i) {
+            return (margin.top + chart_dimensions.height - y_papers(annotation.aimingPoints[i].papers))
+        });
+
+    d3.select(".chart")
+        .append("rect")
+        .attr("id",rectName)
+        .attr("opacity",0)
+        .attr("x",textBlockTopLeft.x-10)
+        .attr("y",textBlockTopLeft.y-20)
+        .attr("height",rectDimensions.height)
+        .attr("width", rectDimensions.width)
+        .attr("fill","lightgrey");
+
+    // Under our text section create tspans for every line of text in the annotation
+    d3.select(".chart")
+        .append("text")
+        .attr("id",textName)
+        .selectAll("tspan").data(annotation.text)
+        .enter()
+        .append("tspan")
+        .attr("class",tspanClass)
+        .attr("opacity",0)
+        .attr("text-anchor","start")
+        .attr("x",textBlockTopLeft.x)
+        .attr("y",function(d,i) { return (textBlockTopLeft.y + i*15) })
+        .text(function(d,i) { return annotation.text[i]});
+
+    d3.selectAll("." + lineClass)
+        .transition()
+        .delay(500)
+        .duration(1000)
+        .attr("opacity",1);
+
+    d3.select("#" + rectName)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+    d3.selectAll("." + tspanClass)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+}
+
 function animateScene2() {
+    insertAnnotation("scene-2");
+
     d3.selectAll(".bar-papers")
         .transition()
         .filter(function(d) { return (d.year > 2001)})
@@ -112,12 +221,9 @@ function animateScene2() {
             return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
 
     // Figure out the aiming point of the annotation line
-    const svgX = x_year(2001);
-    const svgY = (margin.top + chart_dimensions.height - 200); // todo: change bar charts to single rect and use value of point for Y too
+    const svgX = (margin.left + x_year(2002));
+    const svgY = (margin.top + chart_dimensions.height - y_papers(30)); // todo: change bar charts to single rect and use value of point for Y too
 
-    // Figure out where to position the annotation text, relative to the aiming point
-    const dx = 0;
-    const dy = -50;
 
     // const svg = $('.chart')[0];
     //
@@ -132,14 +238,18 @@ function animateScene2() {
     const annotationText = document.getElementById("annotation-text-9-11");
     const annotationTextDimensions = annotationText.getBoundingClientRect();
 
+    // Figure out where to position the annotation text, relative to the aiming point
+    const dx = -annotationTextDimensions.width/2;
+    const dy = -200;
+
     d3.select("#annotation-line-9-11")
         .transition()
         .duration(1000)
         .attr("display","block")
         .attr("x1",(svgX+dx+annotationTextDimensions.width/2))
         .attr("y1",(svgY+dy+annotationTextDimensions.height/2))
-        .attr("x2",(svgX+margin.left+x_year.bandwidth()/2))
-        .attr("y2",(margin.top+chart_dimensions.height-20));
+        .attr("x2",(svgX+x_year.bandwidth()/2))
+        .attr("y2",(svgY));
 
     d3.select("#annotation-group-9-11")
         .transition()
@@ -177,6 +287,39 @@ function animateScene3() {
             referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
             return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
 
+    // Remove the post-911 annotation ...
+    d3.select("#annotation-line-9-11")
+        .transition()
+        .duration(1000)
+        .attr("x1",0)
+        .attr("y1",1000)
+        .attr("x2",0)
+        .attr("y2",1000);
+
+    d3.select("#annotation-text-9-11")
+        .transition()
+        .duration(1000)
+        .attr("transform","translate(0,1000)");
+
+    // and introduce the annotation regarding citations
+
+    const aimX = (margin.left + x_year(2004));
+    const aimY = (margin.top + chart_dimensions.height - y_citations(550));
+    const dx = 0;
+    const dy = -200;
+
+    d3.select("#annotation-line-citations")
+        .transition()
+        .duration(1000)
+        .attr("x1",(aimX+dx))
+        .attr("y1",(aimY+dy))
+        .attr("x2",aimX)
+        .attr("y2",aimY);
+
+    d3.select("#annotation-text-citations")
+        .transition()
+        .duration(1000)
+        .attr("transform","translate(" + (aimX+dx) + "," + (aimY+dy) + ")");
 }
 
 function animateScene4() {
@@ -243,7 +386,6 @@ function animateScene4() {
 }
 
 function deanimateScene2() {
-    console.log("De-animate 2");
 }
 
 function deanimateScene3() {
@@ -311,157 +453,20 @@ d3.dsv(",", "./data.csv", function(d) {
         .range(typeSet.values().map(function(d) {
             return "hsl( " + categoryContinuousColorScale(d) + ", 75%, 50%)"}));
 
+    // d3.select(".chart")
+    //     .append("g")
+    //     .attr("id", "annotation-lines");
+    //
+    // d3.select(".chart")
+    //     .append("g")
+    //     .attr("id","annotation-block")
+    //     .append("text")
+    //     .attr("id","annotation-text");
 
-
-    // Define the div for the tooltips amd annotations
-    annotationDiv = d3.select("body").append("div")
-        .attr("class", "annotation")
-        .style("opacity", 0);
     var tooltipDiv = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    const annotations = {
-        a_911_attack: {
-            className: "invisible toggle-visibility-1",
-            type: d3.annotationLabel,
-            note: {
-                label: "A massive terrorist attack on the United States",
-                bgPadding: 20,
-                title: "September 11th, 2001",
-                align:"middle",
-                orientation:"leftRight",
-                lineType:"vertical"
-            },
-            connector:{end:"arrow",
-                type:"line"},
-            // This is where arrow is pointing
-            x: x_year("2001")+x_year.bandwidth()/2,
-            y: chart_dimensions.height - y_papers(referencesByYear["2001"].papers),
-            // This is where the text box is offset
-            dy: -50,
-            dx: -50,
-        },
-        a_911_abrupt_increase: {
-            className: "invisible toggle-visibility-1",
-            type: d3.annotationLabel,
-            note: {
-                label: "Abrupt increase in cyber-security research",
-                bgPadding: 20,
-                title: "Post 9-11",
-                align: "middle",
-                orientation: "leftRight",
-                lineType: "vertical"
-            },
-            connector: {
-                end: "arrow",
-                type: "line"
-            },
-            // This is where arrow is pointing
-            x: x_year("2002")+x_year.bandwidth()/2,
-            y: chart_dimensions.height - y_papers(referencesByYear["2002"].papers),
-            // This is where the text box is offset
-            dy: -80,
-            dx: -100
-        },
-        a_2010_peak_citations: {
-            className: "invisible toggle-visibility-3",
-            type: d3.annotationCalloutCircle,
-            note: {
-                label: "Citations suddenly increase -- Why?",
-                bgPadding: 20,
-                title: "High citation count",
-                align:"middle",
-                orientation:"leftRight",
-                lineType:"vertical"
-            },
-            connector:{end:"arrow",
-                type:"line"},
-            // This is where arrow is pointing
-            x: x_year("2010")+x_year.bandwidth()/2,
-            y: chart_dimensions.height - y_citations(referencesByYear["2010"].citations),
-            // This is where the text box is offset
-            dy: 50,
-            dx: -100,
-            subject: { radius: 30, radiusPadding: 10 }
-        },
-        a_linear_increase: {
-            className: "invisible toggle-visibility-2",
-            type: d3.annotationLabel,
-            note: {
-                label: "Research has grown steadily",
-                bgPadding: 20,
-                title: "15 years after 9-11",
-                align: "middle",
-                orientation: "leftRight",
-                lineType: "vertical"
-            },
-            connector: {
-                end: "arrow",
-                type: "line"
-            },
-            // This is where arrow is pointing
-            x: x_year("2016")+x_year.bandwidth()/2,
-            y: chart_dimensions.height - y_papers(referencesByYear["2016"].papers),
-            // This is where the text box is offset
-            dy: 100,
-            dx: -200
-        },
-        a_citation_dropoff: {
-            className: "invisible toggle-visibility-4",
-            type: d3.annotationLabel,
-            note: {
-                label: "Citation counts drop off",
-                bgPadding: 20,
-                title: "About 5 years ago",
-                align: "middle",
-                orientation: "leftRight",
-                lineType: "vertical"
-            },
-            connector: {
-                end: "arrow",
-                type: "line"
-            },
-            // This is where arrow is pointing
-            x: x_year("2013"),
-            y: chart_dimensions.height - y_citations(referencesByYear["2013"].citations),
-            // This is where the text box is offset
-            dy: -20,
-            dx: -150
-        },
-        a_paper_citation_ratio: {
-            className: "invisible toggle-visibility-2",
-            type: d3.annotationCalloutCircle,
-            note: {
-                label: "After 9-11 the trend has been consistently about 10 citations per published paper on average",
-                bgPadding: 20,
-                title: "Paper-citation ratio",
-                align:"middle",
-                orientation:"leftRight",
-                lineType:"vertical"
-            },
-            connector:{end:"arrow",
-                type:"line"},
-            // This is where arrow is pointing
-            x: x_year("2005"),
-            y: chart_dimensions.height - y_citations(referencesByYear["2005"].citations),
-            // This is where the text box is offset
-            dy: -80,
-            dx: -50,
-            subject: { radius: 20, radiusPadding: 5 }
-        }
-    };
-    // const annotationsValues = d3.values(annotations);
-    // const annotationBody = d3.select("body");
-    // let i = 0;
-    // for (i = 0; i < annotationsValues.length; i++) {
-    //     const annotation = annotationsValues[i];
-    //     annotationBody.append("div")
-    //         .attr("class","tooltip toggle-visibility-2")
-    //         .attr("opacity",0)
-    //         .html("<p>This is a test of the annotation</p>");
-    //
-    // }
     const chart = d3.select(".chart")
         .attr("width", canvas.width)
         .attr("height", canvas.height);
@@ -641,5 +646,5 @@ d3.dsv(",", "./data.csv", function(d) {
         .style("text-anchor", "middle")
         .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
 
-
+    frameForward();
 });

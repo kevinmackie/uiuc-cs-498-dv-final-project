@@ -11,6 +11,9 @@
     /*border-radius: 8px;*/
     /*pointer-events: none;*/
 /*}*/
+#annotation-text text {
+    fill: black;
+}
 tspan {
     fill: black;
 }
