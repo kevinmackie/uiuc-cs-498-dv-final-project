@@ -11,5 +11,7 @@
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="d3.v5" level="application" />
+    <orderEntry type="library" name="fetch" level="application" />
+    <orderEntry type="library" name="bluebird" level="application" />
   </component>
 </module>
