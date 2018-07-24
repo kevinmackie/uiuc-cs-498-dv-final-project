@@ -22,24 +22,24 @@ function animateScene1() {
     x_year.range([0, chart_dimensions.width])
         .domain(d3.keys(referencesByYear));
 
-    y_papers.domain([0, d3.max(referenceData, d => d.papers)])
+    y_papers.domain([0, d3.max(referenceData, function(d) { return d.papers; })])
         .range([0, chart_dimensions.height]);
 
     const y_papers_axis = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, d => d.papers)])
+        .domain([0, d3.max(referenceData, function(d) { return d.papers; })])
         .range([chart_dimensions.height, 0]);
 
-    y_citations.domain([0, d3.max(referenceData, d => d.citations)])
+    y_citations.domain([0, d3.max(referenceData, function(d) { return d.citations; })])
         .range([0, chart_dimensions.height]);
 
     const y_citations_axis = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, d => d.citations)])
+        .domain([0, d3.max(referenceData, function(d) { return d.citations; })])
         .range([chart_dimensions.height, 0]);
 
-    y_citations_single.domain([1, d3.max(dataSet, d => d.citations)])
+    y_citations_single.domain([1, d3.max(dataSet, function(d) { return d.citations; })])
         .range([0, chart_dimensions.height]);
 
-    y_citations_single_axis.domain([1, d3.max(dataSet, d => d.citations)])
+    y_citations_single_axis.domain([1, d3.max(dataSet, function(d) { return d.citations; })])
         .range([chart_dimensions.height, 0]);
 
     const typeSet = d3.set();
