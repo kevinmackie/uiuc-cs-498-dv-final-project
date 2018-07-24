@@ -1,3 +1,19 @@
+var animateFunctions = [
+    [null, null],
+    [animateScene1, null],
+    [animateScene2,deanimateScene2],
+    [animateScene3,deanimateScene3],
+    [animateScene4,null]
+];
+
+function animateScene( forward ) {
+    if (frame > (animateFunctions.length-1)) return;
+
+    const animateFunction = animateFunctions[frame][(forward?0:1)];
+    if (animateFunction)
+        animateFunction();
+}
+
 function animateScene1() {
     console.log(dataSet);
 

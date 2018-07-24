@@ -22,13 +22,7 @@ function frameBack() {
     animateScene( false );
     frame--;
 }
-function animateScene( forward ) {
-    if (frame > (animateFunctions.length-1)) return;
 
-    const animateFunction = animateFunctions[frame][(forward?0:1)];
-    if (animateFunction)
-        animateFunction();
-}
 
 function jumpToFrame( newFrame ) {
     if (frame === newFrame) return;
@@ -72,10 +66,4 @@ function toggleActive() {
         elements[i].classList.toggle("active")
     }
 }
-var animateFunctions = [
-    [null, null],
-    [animateScene1, null],
-    [animateScene2,deanimateScene2],
-    [animateScene3,deanimateScene3],
-    [animateScene4,null]
-];
+
