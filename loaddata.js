@@ -126,10 +126,6 @@ function removeAnnotation( annotationName ) {
         .duration(500)
         .attr("opacity",0)
         .remove();
-
-    // d3.select("#"+textName).remove();
-    // d3.select("#"+lineSetName).remove();
-    // d3.select("#"+rectName).remove();
 }
 
 function insertAnnotation( annotationName ) {
@@ -365,12 +361,11 @@ function animateScene4() {
     removeAnnotation("scene-3b");
     removeAnnotation("scene-3c");
 
+
+
     d3.selectAll(".bar-papers")
         .transition()
         .duration(1000)
-        .delay(function (d) {
-            return (d.year - 2001) * 10
-        })
         .attr("height", 0)
         .attr("y", chart_dimensions.height);
 
@@ -390,9 +385,6 @@ function animateScene4() {
     d3.selectAll(".bar-citations")
         .transition()
         .duration(1000)
-        .delay(function (d) {
-            return (d.year - 2001) * 10
-        })
         .attr("height", 0)
         .attr("y", chart_dimensions.height);
 
@@ -425,8 +417,38 @@ function animateScene4() {
         .attr("dy","0.35em")
         .style("text-anchor", "start");
 
+    d3.timer(function() {
+        d3.select(".chart")
+            .attr("class", "brush")
+            .call(d3.brush().on("brush", brushed));
+
+    },1100);
+
+    // const tr = d3.select("tbody")
+    //     .selectAll("tr").data(
+    //         [
+    //             {
+    //                 title: "Let's make this a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer title", authors: "Mackie, K - and a long list of authors", citations: 10
+    //             },
+    //             {
+    //                 title: "Title2", authors: "Mackie, K2", citations: 12
+    //             },
+    //         ])
+    //     .enter()
+    //     .append("tr");
+    //
+    // tr.append("td")
+    //     .text(function(d) { return d.title } );
+    // tr.append("td")
+    //     .text(function(d) { return d.authors } );
+    // tr.append("td")
+    //     .text(function(d) { return d.citations } );
 }
 
+function brushed() {
+    console.log("Brushed");
+    console.log(d3.event);
+}
 function deanimateScene2() {
 }
 
