@@ -22,6 +22,18 @@ function animateScene1() {
     x_year.range([0, chart_dimensions.width])
         .domain(d3.keys(referencesByYear));
 
+    x_year.invert = (
+        function(){
+            const domain = x_year.domain();
+            const range = x_year.range();
+            const scale = d3.scaleQuantize().domain(range).range(domain);
+
+            return function(x){
+                return scale(x)
+            }
+        }
+    )();
+
     y_papers.domain([0, d3.max(referenceData, function(d) { return d.papers; })])
         .range([0, chart_dimensions.height]);
 
@@ -410,8 +422,7 @@ function animateScene4() {
     d3.timer(function() {
         d3.select(".chart")
             .attr("class", "brush")
-            .call(d3.brush().on("brush", brushed));
-
+            .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
     },1100);
 
     // const tr = d3.select("tbody")
@@ -441,8 +452,58 @@ function deanimateScene3() {
     console.log("De-nimate 3");
 }
 
-function brushed() {
-    console.log("Brushed");
-    console.log(d3.event);
+function brushStart() {
+    brush_applied = true;
+    year_brush.min = -1;
+    year_brush.max = -1;
+    citations_brush.min = -1;
+    citations_brush.max = -1;
 }
+function brushed() {
+    // Set the current brush filter
+    const topLeft = {
+        x: d3.event.selection[0][0],
+        y: d3.event.selection[0][1]
+    };
+    const bottomRight = {
+        x: d3.event.selection[1][0],
+        y: d3.event.selection[1][1]
+    };
 
+    const minYear = Math.round(x_year.invert(topLeft.x-margin.left+x_year.bandwidth()/2));
+    const maxYear = Math.round(x_year.invert(bottomRight.x-margin.left-x_year.bandwidth()/2));
+
+    const minCitations = Math.round(y_citations_single_axis.invert(bottomRight.y-margin.top));
+    const maxCitations = Math.round(y_citations_single_axis.invert(topLeft.y-margin.top));
+
+    let brush_changed = false;
+
+    if (year_brush.min !== minYear || year_brush.max !== maxYear) {
+        year_brush.min = minYear;
+        year_brush.max = maxYear;
+        brush_changed = true;
+    }
+    if (citations_brush.min !== minCitations || citations_brush.max !== maxCitations) {
+        citations_brush.min = minCitations;
+        citations_brush.max = maxCitations;
+        brush_changed = true;
+    }
+
+    if (brush_changed) {
+        d3.selectAll(".circle-citations")
+            .classed("outside-brush",function(d) {
+                return (!
+                    ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
+                    (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max)));
+            })
+            .classed("inside-brush",function(d) {
+                return (
+                    ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
+                        (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max)));
+            });
+
+    }
+}
+function brushEnd() {
+    
+}

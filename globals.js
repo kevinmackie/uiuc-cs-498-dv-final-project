@@ -18,5 +18,13 @@ const yAxisCitations = d3.axisRight();
 const yAxisPapers = d3.axisLeft();
 const x_year = d3.scaleBand();
 
+var filter_applied = false;
+var year_filter = { min: -1, max: -1 };
+var citations_filter = { min: -1, max: -1 };
+
+var brush_applied = false;
+var year_brush = { min: -1, max: -1 };
+var citations_brush = { min: -1, max: -1 };
+
 var dataSet;
 var svg;
