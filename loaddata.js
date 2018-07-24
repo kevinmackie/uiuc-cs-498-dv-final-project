@@ -99,8 +99,40 @@ var animateFunctions = [
 function animateScene1() {
     insertAnnotation( "scene-1" )
 }
-function insertAnnotation( annotationName ) {
 
+function removeAnnotation( annotationName ) {
+    const rectName = "annotation-rect-" + annotationName;
+    const textName = "annotation-text-" + annotationName;
+    const lineSetName = "annotation-lines-" + annotationName;
+    const lineClass = "annotation-line-" + annotationName;
+    const tspanClass = "annotation-tspan-" + annotationName;
+
+    d3.selectAll("." + lineClass)
+        .transition()
+        .duration(500)
+        .attr("opacity",0)
+        .remove();
+
+    d3.select("#" + rectName)
+        .transition()
+        .delay(250)
+        .duration(250)
+        .attr("opacity",0)
+        .remove();
+
+    d3.selectAll("." + tspanClass)
+        .transition()
+        .delay(250)
+        .duration(250)
+        .attr("opacity",0)
+        .remove();
+
+    // d3.select("#"+textName).remove();
+    // d3.select("#"+lineSetName).remove();
+    // d3.select("#"+rectName).remove();
+}
+
+function insertAnnotation( annotationName ) {
     const rectName = "annotation-rect-" + annotationName;
     const textName = "annotation-text-" + annotationName;
     const lineSetName = "annotation-lines-" + annotationName;
@@ -136,7 +168,7 @@ function insertAnnotation( annotationName ) {
     d3.select("#"+textName).remove();
 
     const textBlockTopLeft = {
-        x: (margin.left+x_year(annotation.textCenter.year)-textBlockDimensions.width/2),
+        x: (margin.left+(x_year(annotation.textCenter.year)+(x_year.bandwidth()*0.75))-textBlockDimensions.width/2),
         y: (margin.top+chart_dimensions.height-y_papers(annotation.textCenter.papers)+textBlockDimensions.height/2)
     };
 
@@ -157,7 +189,7 @@ function insertAnnotation( annotationName ) {
         .attr("x1",lineStartingPoint.x)
         .attr("y1",lineStartingPoint.y)
         .attr("x2",function(d,i) {
-            return (margin.left + x_year(annotation.aimingPoints[i].year));
+            return (margin.left + (x_year(annotation.aimingPoints[i].year)+x_year.bandwidth()*0.75));
         })
         .attr("y2",function(d,i) {
             return (margin.top + chart_dimensions.height - y_papers(annotation.aimingPoints[i].papers))
@@ -190,7 +222,7 @@ function insertAnnotation( annotationName ) {
     d3.selectAll("." + lineClass)
         .transition()
         .delay(500)
-        .duration(1000)
+        .duration(500)
         .attr("opacity",1);
 
     d3.select("#" + rectName)
@@ -263,6 +295,10 @@ function animateScene2() {
 }
 
 function animateScene3() {
+    removeAnnotation("scene-1");
+    removeAnnotation("scene-2");
+    insertAnnotation("scene-3");
+
     d3.select("#yAxisCitationsG")
         .transition()
         .duration(1000)

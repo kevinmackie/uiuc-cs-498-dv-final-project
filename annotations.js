@@ -18,7 +18,7 @@ const annotations = {
             text: ["September 11th Attack:", "Abrupt increase in number of ", "papers published. Steady", "increase since then."],
             textCenter: {
                 year: 2002,
-                papers: 100,
+                papers: 130,
             },
             aimingPoints: [
                 {
@@ -31,13 +31,21 @@ const annotations = {
         {
             text: ["Citations have kept pace at", "about 10-20 to 1. Drop-off in", "2012 suggests it takes about", "5 years to disseminate research"],
             textCenter: {
-                year: 2002,
-                papers: 30
+                year: 2003,
+                papers: 200
             },
             aimingPoints: [
                 {
-                    year: 2002,
-                    papers: 500
+                    year: 2004,
+                    papers: 60
+                },
+                {
+                    year: 2012,
+                    papers: 120
+                },
+                {
+                    year: 2010,
+                    papers: 212
                 }
             ]
         }
