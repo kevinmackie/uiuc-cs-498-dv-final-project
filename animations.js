@@ -60,15 +60,6 @@ function animateScene1() {
             return d;
         });
 
-    const categoryContinuousColorScale = d3.scaleBand()
-        .domain(typeSet.values())
-        .range([0, 350]);
-
-    categoryDiscreteColorScale
-        .domain(typeSet.values())
-        .range(typeSet.values().map(function (d) {
-            return "hsl( " + categoryContinuousColorScale(d) + ", 75%, 50%)"
-        }));
 
     // d3.select(".chart")
     //     .append("g")
@@ -548,7 +539,6 @@ function updateReferencesTable() {
 }
 
 function updateLegend() {
-    console.log("WTF dude");
     const selectedCategories = d3.set();
     dataSet.forEach(function(d,i) {selectedCategories.add(d.type)});
     const selection = d3.select(".filter-category tbody").selectAll("tr").data(selectedCategories.values())
@@ -560,10 +550,7 @@ function updateLegend() {
         .attr("width","40px");
     selection.append("td")
         .attr("bgcolor",function(d) {
-            console.log(categoryDiscreteColorScale(d));
-            console.log(d3.color(categoryDiscreteColorScale(d)).hex());
             return d3.color(categoryDiscreteColorScale(d)).hex();
-            //return categoryDiscreteColorScale(d);
         })
         .attr("width","20px");
     selection.append("td")

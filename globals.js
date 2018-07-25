@@ -17,7 +17,37 @@ const y_citations_single_axis = d3.scaleLog();
 const yAxisCitations = d3.axisRight();
 const yAxisPapers = d3.axisLeft();
 const x_year = d3.scaleBand();
-const categoryDiscreteColorScale = d3.scaleOrdinal();
+const categoryMap = {
+    "Review": "Review",
+    "Article": "Article",
+    "Article in Press": "Press Article",
+    "Business Article": "Press Article",
+    "Editorial":"Press Article",
+    "Conference Paper": "Conference",
+    "Conference Review": "Conference",
+    "Book": "Book",
+    "Open Access":"Open Access",
+    "Short Survey": "Short Survey",
+    "Note": "Note",
+    "Unknown": "Unknown",
+    "Abstract Report": "Abstract Report",
+    "undefined": "Unknown"};
+
+const legendColorMap = {
+        "Review": "#d62728",
+        "Article": "#1f77b4",
+        "Press Article": "#e377c2",
+        "Conference": "#9467bd",
+        "Book": "#ff7f0e",
+        "Open Access":"#2ca02c",
+        "Short Survey":"#8c564b",
+        "Note": "#17becf",
+        "Unknown": "#7f7f7f",
+        "Abstract Report":"#bcbd22"};
+
+const categoryDiscreteColorScale = d3.scaleOrdinal()
+    .domain(d3.keys(legendColorMap))
+    .range(d3.values(legendColorMap));
 
 var filter_applied = false;
 var year_filter = { min: -1, max: -1 };

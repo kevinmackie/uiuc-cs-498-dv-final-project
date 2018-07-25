@@ -18,10 +18,15 @@
     opacity: 0.1;
 }
 
+
 th, td {
     //border: 1px solid black;
-    padding: 5px;
+    padding: 0px;
     font-size: 11px;
+}
+table {
+    border-spacing: 5px;
+    border-collapse: separate;
 }
 
 tspan {
