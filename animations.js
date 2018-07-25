@@ -15,8 +15,6 @@ function animateScene( forward ) {
 }
 
 function animateScene1() {
-    console.log(dataSet);
-
     const referenceData = d3.values(referencesByYear);
 
     x_year.range([0, chart_dimensions.width])
@@ -425,6 +423,8 @@ function animateScene4() {
             .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
     },1100);
 
+    updateLegend();
+
     // const tr = d3.select("tbody")
     //     .selectAll("tr").data(
     //         [
@@ -527,18 +527,42 @@ function updateReferencesTable() {
     let selection;
 
     if (brush_applied) {
-        d3.selectAll("tbody tr").remove();
+        d3.selectAll(".publications tbody tr").remove();
 
-        selection = d3.select("tbody").selectAll("tr").data(dataSet.sort(function(a,b) {
+        selection = d3.select(".publications tbody").selectAll("tr").data(dataSet.sort(function(a,b) {
             return d3.descending(a.citations,b.citations); } ))
             .enter()
             .filter(function(d) { return isInsideBrush(d); })
             .append("tr");
+        selection.append("td")
+            .html(function(d) { return d.year; });
         selection.append("td")
             .html(function(d) { return d.title; });
         selection.append("td")
             .html(function(d) { return d.authors; });
         selection.append("td")
             .html(function(d) { return d.citations; });
+        selection.append("td")
+            .append("a")
+            .attr("href",function(d) { return d.url })
+            .attr("target","_blank")
+            .html(function(d) { return d.url;})
     }
+}
+
+function updateLegend() {
+    const selectedCategories = d3.set();
+    dataSet.forEach(function(d,i) {selectedCategories.add(d.type)});
+    const selection = d3.select(".filter-category tbody").selectAll("tr").data(selectedCategories.values())
+        .enter()
+        .append("tr");
+    selection.append("td")
+        .append("input")
+        .attr("type","checkbox")
+        .attr("width","40px");
+    selection.append("td")
+        .attr("bgcolor","red")
+        .attr("width","20px");
+    selection.append("td")
+        .html(function(d) { return d});
 }

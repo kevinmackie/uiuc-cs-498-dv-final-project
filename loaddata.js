@@ -10,6 +10,12 @@ function loaddata( dataloaded ) {
             abstract: d.Abstract
         };
 
+        if (d.DOI) {
+            dataobj.url = "http://doi.org/" + d.DOI;
+        } else {
+            dataobj.url = "http://scholar.google.com/scholar?q=" + dataobj.title;
+        }
+
         if (!referencesByYear[dataobj.year])
             referencesByYear[dataobj.year] = { year: dataobj.year, papers: 0, citations: 0};
 
