@@ -453,12 +453,27 @@ function deanimateScene3() {
 }
 
 function brushStart() {
+    if (d3.event.selection === null)
+        clearBrush();
     brush_applied = true;
     year_brush.min = -1;
     year_brush.max = -1;
     citations_brush.min = -1;
     citations_brush.max = -1;
 }
+
+function clearBrush() {
+    d3.selectAll(".circle-citations")
+        .classed("outside-brush",false)
+        .classed("inside-brush",false);
+    filter_applied = false;
+}
+
+function isInsideBrush(d) {
+    return ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
+            (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max));
+}
+
 function brushed() {
     // Set the current brush filter
     const topLeft = {
@@ -492,18 +507,38 @@ function brushed() {
     if (brush_changed) {
         d3.selectAll(".circle-citations")
             .classed("outside-brush",function(d) {
-                return (!
-                    ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
-                    (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max)));
+                return !isInsideBrush(d);
             })
             .classed("inside-brush",function(d) {
-                return (
-                    ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
-                        (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max)));
+                return isInsideBrush(d);
             });
 
     }
 }
 function brushEnd() {
-    
+    if (d3.event.selection === null)
+        clearBrush();
+    else {
+        brush_applied = true;
+        updateReferencesTable();
+    }
+}
+function updateReferencesTable() {
+    let selection;
+
+    if (brush_applied) {
+        d3.selectAll("tbody tr").remove();
+
+        selection = d3.select("tbody").selectAll("tr").data(dataSet.sort(function(a,b) {
+            return d3.descending(a.citations,b.citations); } ))
+            .enter()
+            .filter(function(d) { return isInsideBrush(d); })
+            .append("tr");
+        selection.append("td")
+            .html(function(d) { return d.title; });
+        selection.append("td")
+            .html(function(d) { return d.authors; });
+        selection.append("td")
+            .html(function(d) { return d.citations; });
+    }
 }

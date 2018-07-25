@@ -4,7 +4,10 @@ function loaddata( dataloaded ) {
         const dataobj = {
             year: +d.Year,
             citations: +d["Cited by"],
-            type: d.Source
+            type: d.Source,
+            authors: d["Authors"],
+            title: d.Title,
+            abstract: d.Abstract
         };
 
         if (!referencesByYear[dataobj.year])
