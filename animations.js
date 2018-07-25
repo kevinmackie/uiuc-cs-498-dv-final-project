@@ -64,7 +64,7 @@ function animateScene1() {
         .domain(typeSet.values())
         .range([0, 350]);
 
-    const categoryDiscreteColorScale = d3.scaleOrdinal()
+    categoryDiscreteColorScale
         .domain(typeSet.values())
         .range(typeSet.values().map(function (d) {
             return "hsl( " + categoryContinuousColorScale(d) + ", 75%, 50%)"
@@ -526,9 +526,8 @@ function brushEnd() {
 function updateReferencesTable() {
     let selection;
 
+    d3.selectAll(".publications tbody tr").remove();
     if (brush_applied) {
-        d3.selectAll(".publications tbody tr").remove();
-
         selection = d3.select(".publications tbody").selectAll("tr").data(dataSet.sort(function(a,b) {
             return d3.descending(a.citations,b.citations); } ))
             .enter()
@@ -537,20 +536,19 @@ function updateReferencesTable() {
         selection.append("td")
             .html(function(d) { return d.year; });
         selection.append("td")
+            .append("a")
+            .attr("href",function(d) { return d.url; })
+            .attr("target","_blank")
             .html(function(d) { return d.title; });
         selection.append("td")
             .html(function(d) { return d.authors; });
         selection.append("td")
             .html(function(d) { return d.citations; });
-        selection.append("td")
-            .append("a")
-            .attr("href",function(d) { return d.url })
-            .attr("target","_blank")
-            .html(function(d) { return d.url;})
     }
 }
 
 function updateLegend() {
+    console.log("WTF dude");
     const selectedCategories = d3.set();
     dataSet.forEach(function(d,i) {selectedCategories.add(d.type)});
     const selection = d3.select(".filter-category tbody").selectAll("tr").data(selectedCategories.values())
@@ -561,7 +559,12 @@ function updateLegend() {
         .attr("type","checkbox")
         .attr("width","40px");
     selection.append("td")
-        .attr("bgcolor","red")
+        .attr("bgcolor",function(d) {
+            console.log(categoryDiscreteColorScale(d));
+            console.log(d3.color(categoryDiscreteColorScale(d)).hex());
+            return d3.color(categoryDiscreteColorScale(d)).hex();
+            //return categoryDiscreteColorScale(d);
+        })
         .attr("width","20px");
     selection.append("td")
         .html(function(d) { return d});

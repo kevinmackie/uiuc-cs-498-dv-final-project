@@ -17,6 +17,7 @@ const y_citations_single_axis = d3.scaleLog();
 const yAxisCitations = d3.axisRight();
 const yAxisPapers = d3.axisLeft();
 const x_year = d3.scaleBand();
+const categoryDiscreteColorScale = d3.scaleOrdinal();
 
 var filter_applied = false;
 var year_filter = { min: -1, max: -1 };
