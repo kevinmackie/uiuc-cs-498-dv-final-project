@@ -76,24 +76,31 @@ function removeAnnotation( annotationName ) {
     const lineClass = "annotation-line-" + annotationName;
     const tspanClass = "annotation-tspan-" + annotationName;
 
-    d3.selectAll("." + lineClass)
-        .transition()
-        .duration(750)
-        .attr("opacity",0)
-        .remove();
-
-    d3.select("#" + rectName)
-        .transition()
-        .delay(250)
-        .duration(500)
-        .attr("opacity",0)
-        .remove();
-
     d3.selectAll("." + tspanClass)
         .transition()
-        .delay(250)
         .duration(500)
         .attr("opacity",0)
+        .remove();
+    d3.select("#" + rectName)
+        .transition()
+        .duration(500)
+        .attr("opacity",0)
+        .remove();
+    d3.selectAll("." + lineClass)
+        .transition()
+        .duration(500)
+        .attr("opacity",0)
+        .remove();
+    d3.select("#" + textName)
+        .transition()
+        .delay(500)
+        .duration(0)
+        .attr("opacity",0)
+        .remove();
+    d3.select("#" + lineSetName)
+        .transition()
+        .delay(500)
+        .duration(0)
         .remove();
 }
 

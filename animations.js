@@ -3,7 +3,7 @@ var animateFunctions = [
     [animateScene1, null],
     [animateScene2,deanimateScene2],
     [animateScene3,deanimateScene3],
-    [animateScene4,null]
+    [animateScene4,deanimateScene4]
 ];
 
 function animateScene( forward ) {
@@ -42,8 +42,7 @@ function animateScene1() {
     y_citations.domain([0, d3.max(referenceData, function(d) { return d.citations; })])
         .range([0, chart_dimensions.height]);
 
-    const y_citations_axis = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, function(d) { return d.citations; })])
+    y_citations_axis.domain([0, d3.max(referenceData, function(d) { return d.citations; })])
         .range([chart_dimensions.height, 0]);
 
     y_citations_single.domain([1, d3.max(dataSet, function(d) { return d.citations; })])
@@ -256,12 +255,12 @@ function animateScene1() {
         .style("text-anchor", "middle")
         .text("Citations");
 
-    d3.select("svg").append("text")
-        .attr("transform",
-            "translate(" + (margin.left + chart_dimensions.width / 2) + ","
-            + (margin.top / 2) + ")")
-        .style("text-anchor", "middle")
-        .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
+    // d3.select("svg").append("text")
+    //     .attr("transform",
+    //         "translate(" + (margin.left + chart_dimensions.width / 2) + ","
+    //         + (margin.top / 2) + ")")
+    //     .style("text-anchor", "middle")
+    //     .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
 
     insertAnnotation("scene-1");
 
@@ -288,6 +287,7 @@ function animateScene2() {
 function animateScene3() {
     removeAnnotation("scene-1");
     removeAnnotation("scene-2");
+
     insertAnnotation("scene-3a");
     insertAnnotation("scene-3b");
     insertAnnotation("scene-3c");
@@ -315,41 +315,8 @@ function animateScene3() {
             }
             referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
             return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
-
-    // Remove the post-911 annotation ...
-    d3.select("#annotation-line-9-11")
-        .transition()
-        .duration(1000)
-        .attr("x1",0)
-        .attr("y1",1000)
-        .attr("x2",0)
-        .attr("y2",1000);
-
-    d3.select("#annotation-text-9-11")
-        .transition()
-        .duration(1000)
-        .attr("transform","translate(0,1000)");
-
-    // and introduce the annotation regarding citations
-
-    const aimX = (margin.left + x_year(2004));
-    const aimY = (margin.top + chart_dimensions.height - y_citations(550));
-    const dx = 0;
-    const dy = -200;
-
-    d3.select("#annotation-line-citations")
-        .transition()
-        .duration(1000)
-        .attr("x1",(aimX+dx))
-        .attr("y1",(aimY+dy))
-        .attr("x2",aimX)
-        .attr("y2",aimY);
-
-    d3.select("#annotation-text-citations")
-        .transition()
-        .duration(1000)
-        .attr("transform","translate(" + (aimX+dx) + "," + (aimY+dy) + ")");
 }
+
 
 function animateScene4() {
     removeAnnotation("scene-3a");
@@ -402,17 +369,17 @@ function animateScene4() {
         .transition()
         .delay(1000)
         .duration(1000)
-        .call(yAxisCitations.tickFormat(d3.format("d")));
-    // .selectAll("text")
-    // .attr("x",15)
-    // .attr("y",0)
-    // .attr("dx",0)
-    // .attr("dy","0.35em")
-    // .style("text-anchor", "start");
+        .call(yAxisCitations.tickFormat(d3.format("d")))
+        .selectAll("text")
+        .attr("x",15)
+        .attr("y",0)
+        .attr("dx",0)
+        .attr("dy","0.35em")
+        .style("text-anchor", "start");
 
     d3.timer(function() {
         d3.select(".chart")
-            .attr("class", "brush")
+            .classed("brush",true)
             .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
     },1100);
 
@@ -439,12 +406,131 @@ function animateScene4() {
     //     .text(function(d) { return d.citations } );
 }
 function deanimateScene2() {
+    removeAnnotation("scene-2");
+    d3.selectAll(".bar-papers")
+        .filter(function(d) { return (d.year > 2001)})
+        .transition()
+        .duration(500)
+        .delay(function(d) { return (d.year-2001)*10})
+        .attr("height",0)
+        .attr("y",chart_dimensions.height);
+    d3.values(referencesByYear).forEach(function(d) { d.paperBarHeight = 0; })
 }
 
 function deanimateScene3() {
-    console.log("De-nimate 3");
+    removeAnnotation("scene-3a");
+    removeAnnotation("scene-3b");
+    removeAnnotation("scene-3c");
+    insertAnnotation("scene-2");
+    insertAnnotation("scene-1");
+
+    d3.selectAll(".bar-citations")
+        .transition()
+        .delay(function(d) { return (d.year-1980)})
+        .duration(500)
+        .attr("height",0)
+        .attr("y",chart_dimensions.height);
+
+    d3.select("#yAxisCitationsLabel")
+        .transition()
+        .duration(500)
+        .attr("transform",
+            "translate(" + (margin.left + chart_dimensions.width + 50) + ","
+            + ((margin.top + chart_dimensions.height + margin.bottom) + chart_dimensions.height / 2) + "),rotate(-90)");
+
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .duration(500)
+        .attr("transform", "translate(" + (8 + margin.left + chart_dimensions.width) + "," +
+            (margin.top + chart_dimensions.height + margin.bottom) + ")")
+        .call(yAxisCitations);
+
+    d3.values(referencesByYear).forEach(function(d) { d.citationsBarHeight = 0;});
+
 }
 
+function deanimateScene4() {
+    deleteLegend();
+
+    d3.select(".chart")
+        .classed("class", false)
+        .call(d3.brush().on("brush", null).on("start",null).on("end",null));
+
+    yAxisCitations.scale(y_citations_axis);
+
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .duration(500)
+        .call(yAxisCitations.tickFormat(d3.format("d")))
+        .selectAll("text")
+        .attr("x", 15)
+        .attr("y", 0)
+        .attr("dx", 0)
+        .attr("dy", "0.35em")
+        .style("text-anchor", "start");
+
+    d3.selectAll(".circle-citations")
+        .transition()
+        .duration(500)
+        .attr("cx", 0)
+        .attr("cy", chart_dimensions.height)
+        .attr("r", 0)
+        .attr("stroke-width", 0);
+
+    d3.values(referencesByYear).forEach(function(d) { d.citationsBarHeight = 0;});
+
+    d3.selectAll(".bar-citations")
+        .transition()
+        .delay(function(d) { return (d.year-1980)})
+        .duration(500)
+        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].citationsBarHeight) {
+                referencesByYear[d.year].citationsBarHeight = 0;
+            }
+            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
+            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+
+    d3.select("#yAxisPapersLabel")
+        .transition()
+        .duration(500)
+        .attr("transform",
+            "translate(8," + (margin.top + chart_dimensions.height / 2) + ")" +
+            ", rotate(-90)");
+
+    d3.select("#yAxisPapersG")
+        .transition()
+        .duration(500)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(yAxisPapers)
+        .selectAll("text")
+        .attr("x", -30)
+        .attr("y", 0)
+        .attr("dx", 0)
+        .attr("dy", "0.35em")
+        .style("text-anchor", "start");
+
+    d3.values(referencesByYear).forEach(function(d) { d.paperBarHeight = 0});
+
+    d3.selectAll(".bar-papers")
+        .transition()
+        .duration(500)
+        .attr("height",function(d) { return y_papers(1)+0.5})
+        .attr("y",function(d) {
+            if (!referencesByYear[d.year].paperBarHeight) {
+                referencesByYear[d.year].paperBarHeight = 0;
+            }
+            referencesByYear[d.year].paperBarHeight += y_papers(1);
+            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
+
+    insertAnnotation("scene-3a");
+    insertAnnotation("scene-3b");
+    insertAnnotation("scene-3c");
+}
+
+function deleteLegend() {
+    d3.select(".filter-category tbody").selectAll("tr").remove();
+}
 function brushStart() {
     if (d3.event.selection === null)
         clearBrush();
@@ -620,10 +706,10 @@ function updateBrush() {
         });
 }
 function categorySelected(category) {
-        category_filter[category] = this.checked;
-        console.log("Category Selected "+ this.checked);
-        updateLegend();
-        updateReferencesTable();
+    category_filter[category] = this.checked;
+    console.log("Category Selected "+ this.checked);
+    updateLegend();
+    updateReferencesTable();
 }
 function mouseOverCategory(category) {
     d3.selectAll(".circle-citations")
