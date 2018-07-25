@@ -264,6 +264,8 @@ function animateScene1() {
         .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
 
     insertAnnotation("scene-1");
+
+    createLegend();
 }
 
 function animateScene2() {
@@ -392,7 +394,7 @@ function animateScene4() {
         .attr("r",5)
         .attr("fill","black")
         .attr("fill-opacity","0")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 3);
 
     yAxisCitations.scale(y_citations_single_axis);
 
@@ -414,7 +416,7 @@ function animateScene4() {
             .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
     },1100);
 
-    updateLegend();
+    createLegend();
 
     // const tr = d3.select("tbody")
     //     .selectAll("tr").data(
@@ -461,8 +463,14 @@ function clearBrush() {
 }
 
 function isInsideBrush(d) {
-    return ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
-            (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max));
+    return (
+        category_filter[d.type] &&
+        (
+            !brush_applied ||
+            ((d.year >= year_brush.min) && (d.year <= year_brush.max) &&
+                (d.citations >= citations_brush.min) && (d.citations <= citations_brush.max))
+        )
+    );
 }
 
 function brushed() {
@@ -479,7 +487,10 @@ function brushed() {
     const minYear = Math.round(x_year.invert(topLeft.x-margin.left+x_year.bandwidth()/2));
     const maxYear = Math.round(x_year.invert(bottomRight.x-margin.left-x_year.bandwidth()/2));
 
-    const minCitations = Math.round(y_citations_single_axis.invert(bottomRight.y-margin.top));
+    let minCitations = 0;
+    if ((bottomRight.y-margin.top) < chart_dimensions.height)
+        minCitations = Math.round(y_citations_single_axis.invert(bottomRight.y-margin.top));
+
     const maxCitations = Math.round(y_citations_single_axis.invert(topLeft.y-margin.top));
 
     let brush_changed = false;
@@ -507,17 +518,23 @@ function brushed() {
     }
 }
 function brushEnd() {
-    if (d3.event.selection === null)
-        clearBrush();
+    if (d3.event.selection === null) {
+        brush_applied = false;
+        updateBrush();
+        updateReferencesTable();
+    }
     else {
         brush_applied = true;
         updateReferencesTable();
     }
 }
+function clearReferenceTable() {
+    d3.selectAll(".publications tbody tr").remove();
+}
 function updateReferencesTable() {
     let selection;
 
-    d3.selectAll(".publications tbody tr").remove();
+    clearReferenceTable();
     if (brush_applied) {
         selection = d3.select(".publications tbody").selectAll("tr").data(dataSet.sort(function(a,b) {
             return d3.descending(a.citations,b.citations); } ))
@@ -527,10 +544,18 @@ function updateReferencesTable() {
         selection.append("td")
             .html(function(d) { return d.year; });
         selection.append("td")
+            .html(function(d) { return d.type; });
+        selection.append("td")
             .append("a")
             .attr("href",function(d) { return d.url; })
             .attr("target","_blank")
-            .html(function(d) { return d.title; });
+            .html(function(d) { return d.title; })
+            .on("mouseover",function(d) {
+                console.log("Mouse over " + d.title);
+            })
+            .on("mouseout",function(d) {
+                console.log("Mouse off " + d.title);
+            });
         selection.append("td")
             .html(function(d) { return d.authors; });
         selection.append("td")
@@ -539,20 +564,73 @@ function updateReferencesTable() {
 }
 
 function updateLegend() {
-    const selectedCategories = d3.set();
-    dataSet.forEach(function(d,i) {selectedCategories.add(d.type)});
-    const selection = d3.select(".filter-category tbody").selectAll("tr").data(selectedCategories.values())
+    d3.select(".filter-category checkbox").data(d3.keys(category_filter))
+        .property("checked",function(d) {
+            if (category_filter[d])
+                return true;
+            else
+                return null;
+        })
+}
+
+function createLegend() {
+    const selection = d3.select(".filter-category tbody").selectAll("tr").data(d3.keys(category_filter))
         .enter()
         .append("tr");
     selection.append("td")
         .append("input")
+        .attr("id",function(d) {
+            return "checkbox-" + d.toLowerCase().replace(" ","-");
+        } )
         .attr("type","checkbox")
-        .attr("width","40px");
+        .attr("width","40px")
+        .property("checked",function(d) {
+            if (category_filter[d])
+                return true;
+            else
+                return null;
+        })
+        .on("change",function(d) {
+            category_filter[d] = d3.select("#"+ "checkbox-" + d.toLowerCase().replace(" ","-")).property("checked");
+            updateBrush();
+            updateReferencesTable();
+        });
     selection.append("td")
         .attr("bgcolor",function(d) {
             return d3.color(categoryDiscreteColorScale(d)).hex();
         })
-        .attr("width","20px");
+        .attr("width","20px")
+        .on("mouseover",function(d) { mouseOverCategory(d); })
+        .on("mouseout",function() { updateBrush()});
     selection.append("td")
-        .html(function(d) { return d});
+        .html(function(d) { return d})
+        .on("mouseover",function(d) { mouseOverCategory(d); })
+        .on("mouseout",function() { updateBrush()});
+
+    updateLegend();
+}
+
+function updateBrush() {
+    d3.selectAll(".circle-citations")
+        .classed("outside-brush",function(d) {
+            return (!isInsideBrush(d));
+        })
+        .classed("inside-brush",function(d) {
+            return (isInsideBrush(d));
+        });
+}
+function categorySelected(category) {
+        category_filter[category] = this.checked;
+        console.log("Category Selected "+ this.checked);
+        updateLegend();
+        updateReferencesTable();
+}
+function mouseOverCategory(category) {
+    d3.selectAll(".circle-citations")
+        .classed("outside-brush",function(d) {
+            return (d.type !== category);
+        })
+        .classed("inside-brush", function(d) {
+            return (d.type === category);
+        });
 }

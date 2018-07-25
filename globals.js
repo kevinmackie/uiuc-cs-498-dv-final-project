@@ -34,8 +34,8 @@ const categoryMap = {
     "undefined": "Unknown"};
 
 const legendColorMap = {
-        "Review": "#d62728",
-        "Article": "#1f77b4",
+        "Review": "#1f77b4",
+        "Article": "#d62728",
         "Press Article": "#e377c2",
         "Conference": "#9467bd",
         "Book": "#ff7f0e",
@@ -56,6 +56,18 @@ var citations_filter = { min: -1, max: -1 };
 var brush_applied = false;
 var year_brush = { min: -1, max: -1 };
 var citations_brush = { min: -1, max: -1 };
+var category_filter = {
+    "Review": true,
+    "Article": true,
+    "Press Article": true,
+    "Conference": true,
+    "Book": true,
+    "Open Access": true,
+    "Short Survey": true,
+    "Note": true,
+    "Unknown": true,
+    "Abstract Report": true
+};
 
 var dataSet;
 var svg;
