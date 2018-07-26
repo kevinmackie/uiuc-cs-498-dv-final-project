@@ -405,9 +405,12 @@ function showCitationCircles() {
 }
 
 function enableBrush() {
+    brush = d3.brush()
+        .on("brush", brushed).on("start",brushStart).on("end",brushEnd);
+
     d3.timer(function() {
         d3.select(".chart")
-            .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
+            .call(brush);
     },1100);
 }
 
@@ -462,9 +465,9 @@ function deanimateScene3() {
 }
 
 function disableBrush() {
+    brush.on("brush", null).on("start", null).on("end", null);
     d3.select(".chart")
-        .classed("class", false)
-        .call(d3.brush().on("brush", null).on("start", null).on("end", null));
+        .call(brush.move,null);
 }
 
 function morphCitationAxisBackward() {

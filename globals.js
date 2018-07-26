@@ -7,6 +7,8 @@ const chart_dimensions = {
 
 const referencesByYear = {};
 
+let brush;
+
 var frame = 0;
 
 const y_papers = d3.scaleLinear();
