@@ -43,19 +43,19 @@ div .invisible{
 h1 {
     color: lightsteelblue;
 }
-.chart rect.bar-papers {
+.bar-papers-rect {
     fill: orange;
 }
 
-.chart rect.bar-papers:hover {
+.bar-papers-rect:hover {
     fill: darkorange;
 }
 
-.chart rect.bar-citations {
+.bar-citations-rect {
     fill: lightsteelblue;
 }
 
-.chart rect.bar-citations:hover {
+.bar-citations-rect:hover {
     fill: cornflowerblue;
 }
 

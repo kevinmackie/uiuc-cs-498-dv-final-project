@@ -14,6 +14,8 @@ const y_citations = d3.scaleLinear();
 const y_citations_single = d3.scaleLog();
 const y_citations_single_axis = d3.scaleLog();
 const y_citations_axis = d3.scaleLinear();
+const y_papers_axis = d3.scaleLinear();
+let chart;
 
 const yAxisCitations = d3.axisRight();
 const yAxisPapers = d3.axisLeft();

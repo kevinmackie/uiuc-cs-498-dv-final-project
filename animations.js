@@ -14,7 +14,7 @@ function animateScene( forward ) {
         animateFunction();
 }
 
-function animateScene1() {
+function calculateScales() {
     const referenceData = d3.values(referencesByYear);
 
     x_year.range([0, chart_dimensions.width])
@@ -35,8 +35,7 @@ function animateScene1() {
     y_papers.domain([0, d3.max(referenceData, function(d) { return d.papers; })])
         .range([0, chart_dimensions.height]);
 
-    const y_papers_axis = d3.scaleLinear()
-        .domain([0, d3.max(referenceData, function(d) { return d.papers; })])
+    y_papers_axis.domain([0, d3.max(referenceData, function(d) { return d.papers; })])
         .range([chart_dimensions.height, 0]);
 
     y_citations.domain([0, d3.max(referenceData, function(d) { return d.citations; })])
@@ -51,139 +50,108 @@ function animateScene1() {
     y_citations_single_axis.domain([1, d3.max(dataSet, function(d) { return d.citations; })])
         .range([chart_dimensions.height, 0]);
 
-    const typeSet = d3.set();
+}
 
-    d3.values(dataSet).map(
-        function (d) {
-            typeSet.add(d.type);
-            return d;
-        });
-
-
-    // d3.select(".chart")
-    //     .append("g")
-    //     .attr("id", "annotation-lines");
-    //
-    // d3.select(".chart")
-    //     .append("g")
-    //     .attr("id","annotation-block")
-    //     .append("text")
-    //     .attr("id","annotation-text");
-
-    var tooltipDiv = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
-    const chart = d3.select(".chart")
+function initializeChartArea() {
+    chart = d3.select(".chart")
         .attr("width", canvas.width)
         .attr("height", canvas.height);
+}
+function createPaperBars() {
+console.log(referencesByYear);
 
-    const bar = chart.selectAll("g")
-        .data(dataSet)
-        .enter().append("g")
+    d3.select(".chart").selectAll(".bar-papers-group")
+        .data(d3.values(referencesByYear))
+        .enter()
+        .append("g")
+        .classed("bar-papers-group",true)
         .attr("transform",
             function (d) {
-                return "translate(" + (margin.left + (x_year(d.year))) + ", " + margin.top + ")";
-            });
-
-    bar.append("rect")
-        .attr("class", "bar-citations")
-        .attr("x", 0)
-        .attr("y", chart_dimensions.height)
-        .attr("width", x_year.bandwidth() / 2 - 1)
-        .attr("height", 0)
-        .on("mouseover", function (d) {
-            tooltipDiv.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-
-
-        })
-        .on("mouseout", function (d) {
-            tooltipDiv.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
-
-    bar.append("rect")
-        .attr("class", "bar-papers")
+                return "translate(" + (margin.left + (x_year(d.year)-x_year.bandwidth()/2)) + ", " + margin.top + ")";
+            })
+        .append("rect")
+        .classed("bar-papers-rect",true)
         .attr("width", x_year.bandwidth() / 2 - 1)
         .attr("height", 0)
         .attr("x", x_year.bandwidth() / 2)
+        .attr("y", chart_dimensions.height);
+}
+
+function showPaperBars( minYear, maxYear ) {
+
+        d3.selectAll(".bar-papers-rect")
+            .filter(function(d) { return ((d.year >= minYear) && (d.year <= maxYear))})
+            .transition()
+            .duration(1000)
+            .attr("height", function (d) {
+                return y_papers(d.papers);
+            })
+            .attr("y", function (d) {
+                return (chart_dimensions.height - y_papers(d.papers));
+            });
+        //
+        // .on("mouseover", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(200)
+        //         .style("opacity", .9);
+        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+        //         .style("left", (d3.event.pageX) + "px")
+        //         .style("top", (d3.event.pageY - 28) + "px");
+        // })
+        // .on("mouseout", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(1000)
+        //         .style("opacity", 0);
+        // })
+}
+
+function createCitationBars() {
+    d3.select(".chart").selectAll(".bar-citations-group")
+        .data(d3.values(referencesByYear))
+        .enter()
+        .append("g")
+        .classed("bar-citations-group",true)
+        .attr("transform",
+            function (d) {
+                return "translate(" + (margin.left + (x_year(d.year)+x_year.bandwidth()/2)) + ", " + margin.top + ")";
+            })
+        .append("rect")
+        .classed("bar-citations-rect",true)
+        .attr("x", 0)
         .attr("y", chart_dimensions.height)
-        .on("mouseover", function (d) {
-            tooltipDiv.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function (d) {
-            tooltipDiv.transition()
-                .duration(1000)
-                .style("opacity", 0);
-        })
+        .attr("width", x_year.bandwidth() / 2 - 1)
+        .attr("height", 0);
+}
+
+function showCitationBars(minYear,maxYear) {
+    d3.selectAll(".bar-citations-rect")
+        .filter(function(d) { return (d.year >= minYear && d.year <= maxYear)})
         .transition()
-        .filter(function (d) {
-            return (d.year <= 2001)
-        })
         .duration(1000)
-        .delay(function (d) {
-            if (d.year < 2002) return 0; else return (d.year - 2001) * 10
-        })
-        .attr("height", function (d) {
-            return y_papers(1) + 0.5
-        })
-        .attr("y", function (d) {
-            if (!referencesByYear[d.year].paperBarHeight) {
-                referencesByYear[d.year].paperBarHeight = 0;
-            }
-            referencesByYear[d.year].paperBarHeight += y_papers(1);
-            return chart_dimensions.height - referencesByYear[d.year].paperBarHeight
-        });
+        .attr("y",function (d) { return (chart_dimensions.height-y_citations(d.citations)); })
+        .attr("height",function(d) { return y_citations(d.citations)});
+        // .on("mouseover", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(200)
+        //         .style("opacity", .9);
+        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+        //         .style("left", (d3.event.pageX) + "px")
+        //         .style("top", (d3.event.pageY - 28) + "px");
+        // })
+        // .on("mouseout", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(500)
+        //         .style("opacity", 0);
+        // });
+}
 
-    bar.append("circle")
-        .attr("class", "circle-citations")
-        .attr("cx", 0)
-        .attr("cy", chart_dimensions.height)
-        .attr("r", 0)
-        // .attr("class", (function(d) { return ("type-category-color-" + d.type.toLowerCase().replace(" ","-"))}))
-        .attr("stroke", function (d) {
-            return categoryDiscreteColorScale(d.type);
-        })
-        .attr("fill", "black")
-        .attr("fill-opacity", "1")
-        .attr("stroke-width", 0)
-        .on("mouseover", function (d) {
-            tooltipDiv.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function (d) {
-            tooltipDiv.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
-
+function showYearAxis() {
     const xAxisYear = d3.axisBottom().scale(x_year)
-        .tickSize(10).ticks(referenceData.length);
+        .tickSize(10).ticks(d3.keys(referencesByYear));
 
-    yAxisPapers.scale(y_papers_axis)
-        .tickSize(10).ticks(20);
-
-    yAxisCitations.scale(y_citations_axis)
-        .tickSize(10).ticks(20);
-
-    d3.select("svg").append("g")
+    d3.select(".chart").append("g")
         .attr("id", "xAxisG")
-        .attr("class", "x axis")
+        .classed("x axis",true)
         .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height) + ")")
         .call(xAxisYear)
         .selectAll("text")
@@ -194,16 +162,21 @@ function animateScene1() {
         .attr("transform", "rotate(-90)")
         .style("text-anchor", "start");
 
-    d3.select("svg").append("text")
+    d3.select(".chart").append("text")
         .attr("transform",
             "translate(" + (margin.left + chart_dimensions.width / 2) + " ," +
             (margin.top + chart_dimensions.height + 50) + ")")
         .style("text-anchor", "middle")
         .text("Year");
+}
 
-    d3.select("svg").append("g")
+function createPaperAxis() {
+    yAxisPapers.scale(y_papers_axis)
+        .tickSize(10).ticks(20);
+
+    d3.select(".chart").append("g")
         .attr("id", "yAxisPapersG")
-        .attr("class", "y axis papers")
+        .classed("y axis papers",true)
         .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisPapers);
 
@@ -214,7 +187,9 @@ function animateScene1() {
             ", rotate(-90)")
         .style("text-anchor", "middle")
         .text("Papers");
+}
 
+function showPaperAxis() {
     d3.select("#yAxisPapersG")
         .transition()
         .duration(1000)
@@ -233,10 +208,14 @@ function animateScene1() {
         .attr("transform",
             "translate(8," + (margin.top + chart_dimensions.height / 2) + ")" +
             ", rotate(-90)");
+}
+function createCitationAxis() {
+    yAxisCitations.scale(y_citations_axis)
+        .tickSize(10).ticks(20);
 
-    d3.select("svg").append("g")
+    d3.select(".chart").append("g")
         .attr("id", "yAxisCitationsG")
-        .attr("class", "y axis citations")
+        .classed("y axis citations",true)
         .attr("transform", "translate(" + (8 + margin.left + chart_dimensions.width) + "," +
             (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisCitations)
@@ -247,13 +226,74 @@ function animateScene1() {
         .attr("dy", "0.35em")
         .style("text-anchor", "start");
 
-    d3.select("svg").append("text")
+    d3.select(".chart").append("text")
         .attr("id", "yAxisCitationsLabel")
         .attr("transform",
             "translate(" + (margin.left + chart_dimensions.width + 50) + ","
             + ((margin.top + chart_dimensions.height + margin.bottom) + chart_dimensions.height / 2) + "),rotate(-90)")
         .style("text-anchor", "middle")
         .text("Citations");
+
+}
+
+function showCitationAxis() {
+
+    d3.select("#yAxisCitationsG")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + (margin.left + chart_dimensions.width) + "," + margin.top + ")")
+        .call(yAxisCitations);
+
+    d3.select("#yAxisCitationsLabel")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + (margin.left + chart_dimensions.width + 52) + "," +
+            (margin.top + chart_dimensions.height/2) + "),rotate(-90)");
+}
+
+function animateScene1() {
+    initializeChartArea();
+    calculateScales();
+    createPaperBars();
+    showYearAxis();
+    createPaperAxis();
+    showPaperAxis();
+    showPaperBars(0, 2001);
+    insertAnnotation("scene-1");
+
+}
+function createCitationCircles() {
+    d3.select(".chart")
+        .selectAll("circle").data(dataSet)
+        .enter()
+        .append("circle")
+        .attr("class", "circle-citations")
+        .attr("cx", function(d) { return margin.left + x_year(d.year) + x_year.bandwidth()/2} )
+        .attr("cy", chart_dimensions.height)
+        .attr("r", 0)
+        .attr("stroke", function (d) {
+            return categoryDiscreteColorScale(d.type);
+        })
+        .attr("fill", "black")
+        .attr("fill-opacity", "1")
+        .attr("stroke-width", 0);
+        // .on("mouseover", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(200)
+        //         .style("opacity", .9);
+        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+        //         .style("left", (d3.event.pageX) + "px")
+        //         .style("top", (d3.event.pageY - 28) + "px");
+        // })
+        // .on("mouseout", function (d) {
+        //     tooltipDiv.transition()
+        //         .duration(500)
+        //         .style("opacity", 0);
+        // });
+
+}
+function x() {
+
 
     // d3.select("svg").append("text")
     //     .attr("transform",
@@ -269,66 +309,48 @@ function animateScene1() {
 
 function animateScene2() {
     insertAnnotation("scene-2");
-
-    d3.selectAll(".bar-papers")
-        .transition()
-        .filter(function(d) { return (d.year > 2001)})
-        .duration(1000)
-        .delay(function(d) { return (d.year-2001)*10})
-        .attr("height",function(d) { return y_papers(1)+0.5})
-        .attr("y",function(d) {
-            if (!referencesByYear[d.year].paperBarHeight) {
-                referencesByYear[d.year].paperBarHeight = 0;
-            }
-            referencesByYear[d.year].paperBarHeight += y_papers(1);
-            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
+    showPaperBars(2002,2019);
 }
 
 function animateScene3() {
     removeAnnotation("scene-1");
     removeAnnotation("scene-2");
 
+
+    createCitationAxis();
+    showCitationAxis();
+    createCitationBars();
+    showCitationBars(0,2019);
+
     insertAnnotation("scene-3a");
     insertAnnotation("scene-3b");
     insertAnnotation("scene-3c");
 
-    d3.select("#yAxisCitationsG")
-        .transition()
-        .duration(1000)
-        .attr("transform", "translate(" + (margin.left + chart_dimensions.width) + "," + margin.top + ")")
-        .call(yAxisCitations);
-
-    d3.select("#yAxisCitationsLabel")
-        .transition()
-        .duration(1000)
-        .attr("transform", "translate(" + (margin.left + chart_dimensions.width + 52) + "," +
-            (margin.top + chart_dimensions.height/2) + "),rotate(-90)");
-
-    d3.selectAll(".bar-citations")
-        .transition()
-        .delay(function(d) { return (d.year-1980)})
-        .duration(1000)
-        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
-        .attr("y",function(d) {
-            if (!referencesByYear[d.year].citationsBarHeight) {
-                referencesByYear[d.year].citationsBarHeight = 0;
-            }
-            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
-            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+    //
+    // d3.selectAll(".bar-citations")
+    //     .transition()
+    //     .delay(function(d) { return (d.year-1980)})
+    //     .duration(1000)
+    //     .attr("height", function(d) { return y_citations(d.citations)+0.5;})
+    //     .attr("y",function(d) {
+    //         if (!referencesByYear[d.year].citationsBarHeight) {
+    //             referencesByYear[d.year].citationsBarHeight = 0;
+    //         }
+    //         referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
+    //         return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
 }
 
 
-function animateScene4() {
-    removeAnnotation("scene-3a");
-    removeAnnotation("scene-3b");
-    removeAnnotation("scene-3c");
-
-    d3.selectAll(".bar-papers")
+function hidePaperBars(minYear,maxYear) {
+    d3.selectAll(".bar-papers-rect")
+        .filter(function(d) { return (d.year >= minYear && d.year <= maxYear);})
         .transition()
         .duration(1000)
         .attr("height", 0)
         .attr("y", chart_dimensions.height);
+}
 
+function hidePaperAxis() {
     d3.select("#yAxisPapersG")
         .transition()
         .duration(1000)
@@ -342,27 +364,16 @@ function animateScene4() {
         .attr("transform", "translate(" + margin.left + "," + (margin.top+chart_dimensions.height+2*margin.bottom) +
             "), rotate(90)");
 
-    d3.selectAll(".bar-citations")
+}
+
+function hideCitationBars() {
+    d3.selectAll(".bar-citations-rect")
         .transition()
         .duration(1000)
         .attr("height", 0)
         .attr("y", chart_dimensions.height);
-
-    d3.selectAll(".circle-citations")
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("cx",x_year.bandwidth()/2)
-        .attr("cy",function(d) {
-            if (d.citations === 0)
-                return chart_dimensions.height;
-            else
-                return (chart_dimensions.height-y_citations_single(d.citations)) })
-        .attr("r",5)
-        .attr("fill","black")
-        .attr("fill-opacity","0")
-        .attr("stroke-width", 3);
-
+}
+function morphCitationAxisForward() {
     yAxisCitations.scale(y_citations_single_axis);
 
     d3.select("#yAxisCitationsG")
@@ -376,61 +387,53 @@ function animateScene4() {
         .attr("dx",0)
         .attr("dy","0.35em")
         .style("text-anchor", "start");
+}
+function showCitationCircles() {
+    d3.selectAll(".circle-citations")
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .attr("cy",function(d) {
+            if (d.citations === 0)
+                return (margin.top+chart_dimensions.height);
+            else
+                return (margin.top + chart_dimensions.height-y_citations_single(d.citations)) })
+        .attr("r",5)
+        .attr("fill","black")
+        .attr("fill-opacity","0")
+        .attr("stroke-width", 3);
+}
 
+function enableBrush() {
     d3.timer(function() {
         d3.select(".chart")
-            .classed("brush",true)
             .call(d3.brush().on("brush", brushed).on("start",brushStart).on("end",brushEnd));
     },1100);
-
-    createLegend();
-
-    // const tr = d3.select("tbody")
-    //     .selectAll("tr").data(
-    //         [
-    //             {
-    //                 title: "Let's make this a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer titles a bit more interesting with a much much longer title", authors: "Mackie, K - and a long list of authors", citations: 10
-    //             },
-    //             {
-    //                 title: "Title2", authors: "Mackie, K2", citations: 12
-    //             },
-    //         ])
-    //     .enter()
-    //     .append("tr");
-    //
-    // tr.append("td")
-    //     .text(function(d) { return d.title } );
-    // tr.append("td")
-    //     .text(function(d) { return d.authors } );
-    // tr.append("td")
-    //     .text(function(d) { return d.citations } );
-}
-function deanimateScene2() {
-    removeAnnotation("scene-2");
-    d3.selectAll(".bar-papers")
-        .filter(function(d) { return (d.year > 2001)})
-        .transition()
-        .duration(500)
-        .delay(function(d) { return (d.year-2001)*10})
-        .attr("height",0)
-        .attr("y",chart_dimensions.height);
-    d3.values(referencesByYear).forEach(function(d) { d.paperBarHeight = 0; })
 }
 
-function deanimateScene3() {
+function animateScene4() {
     removeAnnotation("scene-3a");
     removeAnnotation("scene-3b");
     removeAnnotation("scene-3c");
-    insertAnnotation("scene-2");
-    insertAnnotation("scene-1");
 
-    d3.selectAll(".bar-citations")
-        .transition()
-        .delay(function(d) { return (d.year-1980)})
-        .duration(500)
-        .attr("height",0)
-        .attr("y",chart_dimensions.height);
+    hidePaperBars(0,2019);
+    hidePaperAxis();
+    hideCitationBars();
 
+    createCitationCircles();
+    morphCitationAxisForward();
+    showCitationCircles();
+
+    enableBrush();
+
+    createLegend();
+}
+function deanimateScene2() {
+    removeAnnotation("scene-2");
+    hidePaperBars(2002,2019);
+}
+
+function hideCitationAxis() {
     d3.select("#yAxisCitationsLabel")
         .transition()
         .duration(500)
@@ -444,18 +447,27 @@ function deanimateScene3() {
         .attr("transform", "translate(" + (8 + margin.left + chart_dimensions.width) + "," +
             (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisCitations);
+}
 
-    d3.values(referencesByYear).forEach(function(d) { d.citationsBarHeight = 0;});
+function deanimateScene3() {
+    removeAnnotation("scene-3a");
+    removeAnnotation("scene-3b");
+    removeAnnotation("scene-3c");
+    insertAnnotation("scene-2");
+    insertAnnotation("scene-1");
+
+    hideCitationBars();
+    hideCitationAxis();
 
 }
 
-function deanimateScene4() {
-    deleteLegend();
-
+function disableBrush() {
     d3.select(".chart")
         .classed("class", false)
-        .call(d3.brush().on("brush", null).on("start",null).on("end",null));
+        .call(d3.brush().on("brush", null).on("start", null).on("end", null));
+}
 
+function morphCitationAxisBackward() {
     yAxisCitations.scale(y_citations_axis);
 
     d3.select("#yAxisCitationsG")
@@ -468,60 +480,27 @@ function deanimateScene4() {
         .attr("dx", 0)
         .attr("dy", "0.35em")
         .style("text-anchor", "start");
+}
 
+function hideCitationCircles() {
     d3.selectAll(".circle-citations")
         .transition()
         .duration(500)
-        .attr("cx", 0)
         .attr("cy", chart_dimensions.height)
         .attr("r", 0)
         .attr("stroke-width", 0);
+}
 
-    d3.values(referencesByYear).forEach(function(d) { d.citationsBarHeight = 0;});
+function deanimateScene4() {
+    deleteLegend();
+    disableBrush();
 
-    d3.selectAll(".bar-citations")
-        .transition()
-        .delay(function(d) { return (d.year-1980)})
-        .duration(500)
-        .attr("height", function(d) { return y_citations(d.citations)+0.5;})
-        .attr("y",function(d) {
-            if (!referencesByYear[d.year].citationsBarHeight) {
-                referencesByYear[d.year].citationsBarHeight = 0;
-            }
-            referencesByYear[d.year].citationsBarHeight += y_citations(d.citations);
-            return (chart_dimensions.height-referencesByYear[d.year].citationsBarHeight)});
+    morphCitationAxisBackward();
+    hideCitationCircles();
 
-    d3.select("#yAxisPapersLabel")
-        .transition()
-        .duration(500)
-        .attr("transform",
-            "translate(8," + (margin.top + chart_dimensions.height / 2) + ")" +
-            ", rotate(-90)");
-
-    d3.select("#yAxisPapersG")
-        .transition()
-        .duration(500)
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(yAxisPapers)
-        .selectAll("text")
-        .attr("x", -30)
-        .attr("y", 0)
-        .attr("dx", 0)
-        .attr("dy", "0.35em")
-        .style("text-anchor", "start");
-
-    d3.values(referencesByYear).forEach(function(d) { d.paperBarHeight = 0});
-
-    d3.selectAll(".bar-papers")
-        .transition()
-        .duration(500)
-        .attr("height",function(d) { return y_papers(1)+0.5})
-        .attr("y",function(d) {
-            if (!referencesByYear[d.year].paperBarHeight) {
-                referencesByYear[d.year].paperBarHeight = 0;
-            }
-            referencesByYear[d.year].paperBarHeight += y_papers(1);
-            return chart_dimensions.height-referencesByYear[d.year].paperBarHeight});
+    showCitationBars(0,2019);
+    showPaperAxis();
+    showPaperBars(0,2019);
 
     insertAnnotation("scene-3a");
     insertAnnotation("scene-3b");
@@ -635,13 +614,7 @@ function updateReferencesTable() {
             .append("a")
             .attr("href",function(d) { return d.url; })
             .attr("target","_blank")
-            .html(function(d) { return d.title; })
-            .on("mouseover",function(d) {
-                console.log("Mouse over " + d.title);
-            })
-            .on("mouseout",function(d) {
-                console.log("Mouse off " + d.title);
-            });
+            .html(function(d) { return d.title; });
         selection.append("td")
             .html(function(d) { return d.authors; });
         selection.append("td")
