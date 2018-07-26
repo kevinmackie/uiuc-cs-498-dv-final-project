@@ -42,7 +42,7 @@ const annotations = {
             ]
         },
     "scene-3b": {
-        text: ["Drop-off in citations in 2012",
+        text: ["Drop-off in citations in 2013",
                "suggests that it takes 5+ years",
                "for the effect of research to be felt"],
         textCenter: {
@@ -50,7 +50,7 @@ const annotations = {
             papers: 170
         },
         aimingPoints: [{
-            year: 2012,
+            year: 2013,
             papers: 120
         }
         ]
