@@ -407,11 +407,10 @@ function showCitationCircles() {
 function enableBrush() {
     brush = d3.brush()
         .on("brush", brushed).on("start",brushStart).on("end",brushEnd);
-
-    d3.timer(function() {
-        d3.select(".chart")
-            .call(brush);
-    },1100);
+    d3.select(".chart")
+        .append("g")
+        .attr("class", "brush")
+        .call(brush);
 }
 
 function animateScene4() {
@@ -465,9 +464,10 @@ function deanimateScene3() {
 }
 
 function disableBrush() {
-    brush.on("brush", null).on("start", null).on("end", null);
-    d3.select(".chart")
-        .call(brush.move,null);
+    clearBrush();
+
+    d3.select(".chart").selectAll(".brush").remove();
+
 }
 
 function morphCitationAxisBackward() {
@@ -489,17 +489,19 @@ function hideCitationCircles() {
     d3.selectAll(".circle-citations")
         .transition()
         .duration(500)
-        .attr("cy", chart_dimensions.height)
+        .attr("cy", (margin.top+chart_dimensions.height))
         .attr("r", 0)
-        .attr("stroke-width", 0);
+        .attr("stroke-width", 0)
+        .remove();
 }
 
 function deanimateScene4() {
     deleteLegend();
     disableBrush();
+    clearFilters();
 
-    morphCitationAxisBackward();
     hideCitationCircles();
+    morphCitationAxisBackward();
 
     showCitationBars(0,2019);
     showPaperAxis();
@@ -509,7 +511,13 @@ function deanimateScene4() {
     insertAnnotation("scene-3b");
     insertAnnotation("scene-3c");
 }
-
+function clearFilters() {
+    brush_applied = false;
+    year_filter.min = -1;
+    year_filter.max = -1;
+    filter_applied = false;
+    d3.keys(category_filter).forEach(function(d) { category_filter[d] = true;})
+}
 function deleteLegend() {
     d3.select(".filter-category tbody").selectAll("tr").remove();
 }
@@ -524,10 +532,10 @@ function brushStart() {
 }
 
 function clearBrush() {
-    d3.selectAll(".circle-citations")
-        .classed("outside-brush",false)
-        .classed("inside-brush",false);
     filter_applied = false;
+    brush_applied = false;
+    updateBrush();
+    updateReferencesTable();
 }
 
 function isInsideBrush(d) {
@@ -575,14 +583,7 @@ function brushed() {
     }
 
     if (brush_changed) {
-        d3.selectAll(".circle-citations")
-            .classed("outside-brush",function(d) {
-                return !isInsideBrush(d);
-            })
-            .classed("inside-brush",function(d) {
-                return isInsideBrush(d);
-            });
-
+        updateBrush();
     }
 }
 function brushEnd() {
