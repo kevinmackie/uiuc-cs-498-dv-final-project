@@ -4,60 +4,108 @@
 </head>
 
 <body>
-<div class="container">
+<div style="width: 500px">
   <h1 align="left">About the Visualization</h1>
 
-  <p>The narrative visualization has been built with a hybrid structure and consists of scenes,
+  CS 498 Data Visualization - Summer 2018 - University of Illinois Urbana Champaign
+  Final Project
+  by Kevin Mackie
+
+  <p>The narrative visualization uses a hybrid structure and consists of scenes,
     annotations, parameters, and triggers, as described below</p>
 
   <h2>Hybrid Structure</h2>
-  This narrative visualization follows a "martini glass" hybrid structure consisting of three author-drive
-  scenes followed by a final scene in which the read is allowed to explore the literature in an open-ended manner.
+  This narrative visualization follows a "martini glass" structure consisting of four author-driven
+  scenes followed by a final scene in which the reader is allowed to explore the literature in an open-ended manner.
+
   <h2>Scenes</h2>
-  The three author-driven scenes follow an identical layout to keep the user from becoming confused in the
-  transition between scenes. Transition animation is used to both maintain reader engagement and to orient
-  the reader during changes between scenes.
+  The four author-driven scenes follow an identical layout. The chart is
+  centered and framed by a large explanatory title and sidebar. The intent is to draw reader attention to the
+  chart and keep it there through transition from scene to scene. The position of elements is maintained across all scenes
+  to keep the user oriented on the chart. Transitions are used between scenes to make the connection between
+  scenes more obvious.
 
-  <h3>Scene Layout and Visual Structure</h3>
-  <p>Scenes are templated for consistency and arranged to draw attention to the central chart, which is framed by
-  a large thematic title and explanatory sidebar. Page buttons and left and right arrows are used to transition
-    between scenes (or to jump to a particular scene).</p>
-  <p></p>
+  <p>The scene structure is maintained for the reader-driven portion at the end, but an additional section is
+    added underneath the chart for the table of publications.</p>
+  <p>Scenes are navigated with page buttons at the top of the display which show the current "slide" (story point)
+    and allow for forward and backward movement through the story or to jump to individual scenes.</p>
+
   <h2>Annotations</h2>
-  Annotations are placed on the chart to highlight key points and trends in the data. They are implemented
-  in a visually consistent manner. Annotations appear in the scene to which they relate, and then disappear
-  when the user advanced to the next scene to prevent the chart from becoming cluttered and to allow
-  focus on the next point in the story.
+  <p>Annotations are synchronized with the story points in the narrative,
+    so data is added to the chart and an annotation is then added to explain the significance of the data.
+    They take the place of the author standing at the side of the reader and explaining the chart point by point.</p>
+
+  <p>Annotations for each scene are added at the start of the scene, and timed to point to the specific data
+    added to the chart for that scene in order to explain its significance.</p>
+
+  <p>Annotations from the previous scene are removed during transitions so that the reader is
+    drawn to the new annotation and point in the story (and also to prevent clutter and hence distraction).</p>
+
+  <p>Annotations use the same template: an opaque grey rectangle with black text and a line directed at the point of interest on the
+    chart.</p>
+
   <h2>Parameters</h2>
-  The key parameter during the initial author-drive scenes is the scene number, which determines the title and sidebar
-  text and the visible elements on the chart: axes, data items, annotations.
-  In the final reader-driven scene, the parameters are:
-  - Year axis range
-  - Citation range
-  - Category
+  The common parameters for all scenes are as follows:
+  <ul>
+    <li><b>Scene number</b> - scenes are rendered in the same window, and scene number is a parameter
+    that drives the presentation.</li>
+    <li><b>Scene title, sidebar text, chart titles</b>- these elements are parameters that change based on the scene</li>
+  </ul>
 
-    The parameters should be identified in the essay, which should also discuss the states of the
-  narrative visualization.
+  Parameters that are specific to the author-driven portion (scenes 0-3) are: 
+  <ul>
+    <li><b>Annotation aiming point, position, text</b> - annotations are parameterized with an aiming point (using 
+    data coordinates rather than screen coordinates), a text offset and the content of the annotation</li>
+    <li><b>Chart type and axis, date range</b> - depending on the scene and point being made, the visualization
+      will show or hide one or another of the two main axes (citations, papers) and limit the date range to draw
+      reader focus on a certain period of time.</li>
+  </ul>
+ 
+  Parameters that are specific to the reader-drive portion (last scene):
+  <ul>
+    <li><b>Publication type filters</b> - user can select/filter the chart by publication type</li>
+    <li><b>Publication type hovered over</b> - the type currently hovered over is visually filtered off the display</li>
+    <li><b>Range brushed</b> - the date and citation ranges are determined by the rectangular selection (brush) on the chart </li>
+    <li><b>Category color</b> - color is used to mark publication type on the chart</li>
+    <li><b>Papers</b> - a text table showing the list of papers selected is rendered at the bottom of the page</li>
+  </ul>
+
+  <h4>Narrative visualization states</h4>
+
+  <p>The visualization is basically a state machine. The scene number drives many of the other parameters, such as title, annotations,
+    graph types and date ranges.</p>
+  <p>The user can move back and forth through the state machine, and transitions are implied in both forward and reverse for these
+  transitions.</p>
+  <p>For the exploratory/reader-driven portion there is a state machine within a state machine, as the visualization
+    must track whether the selection brush is active, which types have been filtered out, and whether or not the user
+    is dragging the selection brush.</p>
+
   <h2>Triggers</h2>
-  The triggers should also be identified in the essay, in terms of the events and the parameter
-  changes they trigger. User interface events should be listed, along with a description of how
-  possible user events are communicated to the viewer.
-  - Page load sets up the first scene and "starts" the state machine in the initial state
-  - Advancing to the next scene triggers a change in title and sidebar, as well as transition animations and
-  annotations to highlight the story being told in that scene
-  - Mouse over events on the chart trigger a tooltip showing drill down details
-  - Clicking the last chart selects the papers at the point on the graph
-  - selected papers are identified by their coordinates (year, citations)
-  - Clicking and dragging on the chart filters the axes (year and citations) and is the same as clicking but
-  over a wider axis range
-  - Mousing over a legend label highlights data in that category (by desaturating and lowering the brightness
-  over other data values)
-  - Clicking a legend label selects or deselects that category
-  -
-  - Left and right arrows become enabled depending on state
-  - As the scene increments, elements on the page become visible (or invisible), and enabled (or disabled) as appropriate
-  to the current state of the visualization
+  <p>The first trigger is the <b>completion of the HTML page load</b>, which invokes the routines to initialize the visualization.</p>
+  <p>This is followed by the CSV data load, during which a "Loading data ... " message is presented. When the <b>CSV data
+    load finishes</b> a trigger causes the first scene to be rendered.</p>
 
+  <p>The user advances through the presentation by clicking the forward- and backward buttons. This triggers a change
+  in state variable (scene/frame) which updates the page buttons (active/inactive/selected) as well as the
+    common parameters described above: scene title, chart title, sidebar text, chart, axis, date range.
+  </p>
+  <p>On the reader-driven chart, mousing over the type legend triggers an update in opacity of points on the
+  scatterplot to highlight the type currently being hovered over.</p>
+  <p>Mousing over the scatterplot causes the cursor to change to a plus +. This lets the user know that a
+  brush selection action is possible.</p>
+  <p>Selecting a region on the scatterplot with mouse causes the circles (data points) to be highlighted under the
+  selected region.</p>
+  <p>Finishing a brush selection on the scatterplot causes the papers under the selection region to be shown
+    in the text table below the chart.</p>
+  <p>Clicking the checkbox on the type legend on the scatterplot causes a filter to be applied which then triggers
+  an update to delect papers of that type from the plot and the table</p>
+
+  <h2>Acknowledgements</h2>
+  <ul>
+    <li>Website hosted on <b>Github Pages</b></li>
+    <li>d3 v5 used for charts http://d3js.org</li>
+    <li>Bootstrap v3 was used (very little) for basic web framework</li>
+  </ul>
 </div>
 </body>
 </html>

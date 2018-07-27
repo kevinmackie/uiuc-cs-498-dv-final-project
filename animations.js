@@ -319,7 +319,7 @@ function animateScene0() {
     showCitationAxis();
     showCitationBars(0,2019);
 
-    showChartTitle("SCADA Cybersecurity Papers and Citations queried from Scopus, Year-over-Year, as of July 8th, 2018");
+    showChartTitle("SCADA Cybersecurity papers and citations queried from Scopus, as of July 2018");
 }
 function animateScene1() {
 
@@ -329,7 +329,7 @@ function animateScene1() {
     hidePaperBars(2002,2019);
 
     showPaperBars(0,2001);
-    changeChartTitle("SCADA Cybersecurity Papers, Year-over-Year, from the ealiest available to 2001")
+    changeChartTitle("SCADA Cybersecurity papers published, year-over-year, up to 2001")
     insertAnnotation("scene-1");
 
 }
@@ -392,7 +392,7 @@ function changeChartTitle(title) {
 function animateScene2() {
     insertAnnotation("scene-2");
     showPaperBars(2002,2019);
-    changeChartTitle("SCADA Cybersecurity Papers, Year-over-Year, up to present (2018)")
+    changeChartTitle("SCADA Cybersecurity papers, year-over-year, up to July 2018")
 }
 
 function animateScene3() {
@@ -404,7 +404,7 @@ function animateScene3() {
     createCitationBars();
     showCitationBars(0,2019);
 
-    changeChartTitle("SCADA Cybersecurity Papers Published and Citations Received (up to July 8th, 2018)");
+    changeChartTitle("SCADA Cybersecurity papers published and citations received, up to July 2018");
     insertAnnotation("scene-3a");
     insertAnnotation("scene-3b");
     insertAnnotation("scene-3c");
@@ -509,7 +509,7 @@ function animateScene4() {
     morphCitationAxisForward();
     showCitationCircles();
 
-    changeChartTitle("Each paper published in Scopus plotted by year and citation count");
+    changeChartTitle("Every paper queried from Scopus, plotted by year and citation count and colored by type");
     enableBrush();
 
     createLegend();

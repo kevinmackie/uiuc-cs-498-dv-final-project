@@ -11,6 +11,10 @@
     /*border-radius: 8px;*/
     /*pointer-events: none;*/
 /*}*/
+
+li {
+    font-size: 12px;
+}
 #annotation-text text {
     fill: black;
 }

@@ -5,12 +5,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CS 498 DV Final Project by Kevin Mackie</title>
+
+    <!-- The following two libraries are imported only for compatibility with Internet Explorer, due to a bug
+    that caused incompatibility with features of d3. See -->
     <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+
+    <!-- Bootstrap, jquery, and d3 are the only external libraries used -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+
+    <!-- Internal project inclusions -->
     <link rel="stylesheet" type="text/css" href="chart.css"/>
     <script type="text/javascript" src="globals.js"></script>
     <script type="text/javascript" src="annotations.js"></script>
@@ -89,12 +96,12 @@
                     to explore further into the SCADA cybersecurity research literature.</p>
             </div>
             <div id="n-04" class="invisible toggle-visibility-4 toggle-visibility-5">
-                <h3>Here's what you can do:</h3>
+                <h4>Here's what you can do:</h4>
                 <ul>
-                    <li>Use brush stroke in the graph (click and drag) to create a selection of papers which you will
-                        then see listed in the table below</li>
-                    <li>Hover over the category legend to highlight papers of that type</li>
-                    <li>Click titles in the table to open a separate webpage to the paper itself</li>
+                    <li>Select papers by clicking and dragging on the chart. <b>The papers will be listed in the table below</b></li>
+                    <li>Hover over publication types on the legend to highlight papers of that type on the chart</li>
+                    <li>Filter by type by clicking the checkboxes in the legend</li>
+                    <li>Click titles in the table to open a link (separate webpage) to the paper itself</li>
                 </ul>
                 <div>
                     <table class="filter-category invisible toggle-visibility-4" align="right">
@@ -119,21 +126,6 @@
                 <h4 align="center">Loading visualization data. Please wait ...</h4>
             </div>
             <div id="chart-div" class="invisible" style="position: relative; width: 900px; height: 500px;">
-                <!--<div id="intro-title"-->
-                     <!--style="width: 900px; height: 500px; padding: 80px;position: relative; z-index: 2; top: 0; left: 0; background-color: rgb(158,202,225); opacity: 0">-->
-                    <!--<h4 align="left">Welcome</h4>-->
-                    <!--<p>This website contains a narrative visualization presenting data related to research into cybersecurity-->
-                        <!--for SCADA systems. SCADA (Supervisory Control and Data Acquisition) systems are used used for-->
-                        <!--monitoring and control of critical infrastructure elements such as pipelines, power distribution-->
-                        <!--networks, nuclear power facilities.</p>-->
-                    <!--<p>The narrative visualization is divided into two parts. The first part presents the overarching-->
-                        <!--story of SCADA security research as it has developed over the last 30+ years. This is done-->
-                        <!--using animated bar charts showing key metrics of papers published and citations received year over year..</p>-->
-                    <!--<p>The second part allows you to explore the literature yourself by filtering and selecting data-->
-                        <!--and seeing the underlying research papers.</p>-->
-                    <!--<p>Use the right arrow button in the top left of this page to navigate to the next scene in the-->
-                    <!--narrative visualization.</p>-->
-                <!--</div>-->
                 <svg id="chart-id" class="chart" style="position: absolute; z-index: 1; top: 0; left: 0; opacity: 0">
                 </svg>
             </div>
@@ -164,9 +156,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 </body>
-
 </html>
