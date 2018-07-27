@@ -35,10 +35,11 @@
     <div class="row">
         <div class="col-xs-3">
             <p></p>
-            <button type="button" class="btn btn-default disabled toggle-enabled-2" onclick="frameBack()">
+            <button type="button" class="btn btn-default disabled toggle-enabled-1" onclick="frameBack()">
                 <span class="glyphicon glyphicon-chevron-left"></span>
             </button>
-            <button type="button" class="btn btn-default active toggle-active-2" onclick="jumpToFrame(1)">1</button>
+            <button type="button" class="btn btn-default active toggle-active-1" onclick="jumpToFrame(0)">0</button>
+            <button type="button" class="btn btn-default toggle-active-1 toggle-active-2" onclick="jumpToFrame(1)">1</button>
             <button type="button" class="btn btn-default toggle-active-2 toggle-active-3" onclick="jumpToFrame(2)">2</button>
             <button type="button" class="btn btn-default toggle-active-3 toggle-active-4" onclick="jumpToFrame(3)">3</button>
             <button type="button" class="btn btn-default toggle-active-4" onclick="jumpToFrame(4)">4</button>
@@ -47,7 +48,8 @@
             </button>
         </div>
         <div class="col-xs-7">
-            <div class="toggle-visibility-2"><h1 align="center">A Modest Amount of Literature: Pre-2002</h1></div>
+            <div class="toggle-visibility-1"><h1 align="center">Introduction</h1></div>
+            <div class="invisible toggle-visibility-1 toggle-visibility-2"><h1 align="center">A Modest Amount of Literature: Pre-2002</h1></div>
             <div class="invisible toggle-visibility-2 toggle-visibility-3" align="center"><h1>The Post 9-11 Increase: 2002 to Today</h1></div>
             <div class="invisible toggle-visibility-3 toggle-visibility-4" align="center"><h1>The Pace of Citations</h1></div>
             <div class="invisible toggle-visibility-4" align="center"><h1>Explore For Yourself</h1></div>
@@ -58,45 +60,48 @@
     </div>
     <div class="row narrative">
         <div class="col-xs-3">
-            <div id="n-00" class="toggle-visibility-2">
-                <h3>SCADA Cybersecurity Research Landscape</h3>
-                <p>This interactive website will present the research landscape for SCADA cybersecurity, after
-                    which it will allow you to explore this research yourself via an interactive webpage.</p>
-                <p><em>SCADA</em> systems are computerized control systems for critical infrastructure networks
-                    such as oil and gas pipelines; water, electrical, or gas distribution systems, etc.
-                </p>
+            <div id="n-00" class="visible toggle-visibility-1">
+                <h4>When You're Ready ...</h4>
+                Click the above right arrow button to navigate to the next scene in our story.
+            </div>
+            <div id="n-01" class="invisible toggle-visibility-1 toggle-visibility-2">
+                <h3>Early Research Landscape</h3>
                 <p>The graph on the right shows statistics of SCADA cybersecurity research published prior to 2002.
                 </p>
+                <p>The amount of research is relatively small with a trend of slight growth over time.</p>
                 <p>See the next slide for research trends after 2001.</p>
             </div>
             <div id="n-02" class="invisible toggle-visibility-2 toggle-visibility-3">
                 <h3>Post 9-11 Increase in Research</h3>
                 <p>The trend shows an abrupt increase in SCADA cybersecurity reserach following the attacks of
                     9-11. Correlation does not imply causation, and more detailed research would be needed to
-                    know what effect the terrorists attacks had on the volume of security research.
+                    determine possible causes of this increase in research activity.
                 </p>
             </div>
             <div id="n-03" class="invisible toggle-visibility-3 toggle-visibility-4">
                 <h3>Research Citations</h3>
-                <p>We see here the total citations to date for papers published in each year. The general
-                    ratio is approximately 10-20 citations per paper.
-                    The drop-off in citations after 2012 suggests that it takes more than 5 years for the full
-                    effect of research to be felt.
-                </p>
-                <p>We also see an interesting jump in research citations in the 2010-2011 timeframe.</p>
-                <p>We now proceed to the interactive portion of the presentation, where you will be able
-                    to drill down into further details into the SCADA cybersecurity research data.</p>
+                <p>We see here the total citations to date for papers published in each year.</p>
+                <p>The general ratio is approximately 10-20 citations per paper.<p>
+                <p>The drop-off in citations after 2013 suggests that it takes more than 5 years for the full
+                    effect of research to be reached.</p>
+                <p>There is an interesting jump in research citations in 2010-2011.</p>
+                <p>We now proceed to the interactive portion of the narrative, where you will be able
+                    to explore further into the SCADA cybersecurity research literature.</p>
             </div>
             <div id="n-04" class="invisible toggle-visibility-4 toggle-visibility-5">
-                <!--<p>Now explore the literature yourself. Use click and drag over the graph to select papers-->
-                    <!--(i.e. filter by year and citation count). Or select a category from the list below-->
-                    <!--to filter by category.</p>-->
+                <h3>Here's what you can do:</h3>
+                <ul>
+                    <li>Use brush stroke in the graph (click and drag) to create a selection of papers which you will
+                        then see listed in the table below</li>
+                    <li>Hover over the category legend to highlight papers of that type</li>
+                    <li>Click titles in the table to open a separate webpage to the paper itself</li>
+                </ul>
                 <div>
                     <table class="filter-category invisible toggle-visibility-4" align="right">
                         <thead>
-                            <tr>
-                                <td colspan="3" align="center">Type Legend</td>
-                            </tr>
+                        <tr>
+                            <td colspan="3" align="center">Type Legend</td>
+                        </tr>
                         </thead>
                         <tbody>
                         </tbody>
@@ -105,8 +110,33 @@
             </div>
         </div>
         <div class="col-xs-7">
-            <svg id="chart-id" class="chart">
-            </svg>
+            <div id="loading-message">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <h4 align="center">Loading visualization data. Please wait ...</h4>
+            </div>
+            <div id="chart-div" class="invisible" style="position: relative; width: 900px; height: 500px;">
+                <!--<div id="intro-title"-->
+                     <!--style="width: 900px; height: 500px; padding: 80px;position: relative; z-index: 2; top: 0; left: 0; background-color: rgb(158,202,225); opacity: 0">-->
+                    <!--<h4 align="left">Welcome</h4>-->
+                    <!--<p>This website contains a narrative visualization presenting data related to research into cybersecurity-->
+                        <!--for SCADA systems. SCADA (Supervisory Control and Data Acquisition) systems are used used for-->
+                        <!--monitoring and control of critical infrastructure elements such as pipelines, power distribution-->
+                        <!--networks, nuclear power facilities.</p>-->
+                    <!--<p>The narrative visualization is divided into two parts. The first part presents the overarching-->
+                        <!--story of SCADA security research as it has developed over the last 30+ years. This is done-->
+                        <!--using animated bar charts showing key metrics of papers published and citations received year over year..</p>-->
+                    <!--<p>The second part allows you to explore the literature yourself by filtering and selecting data-->
+                        <!--and seeing the underlying research papers.</p>-->
+                    <!--<p>Use the right arrow button in the top left of this page to navigate to the next scene in the-->
+                    <!--narrative visualization.</p>-->
+                <!--</div>-->
+                <svg id="chart-id" class="chart" style="position: absolute; z-index: 1; top: 0; left: 0; opacity: 0">
+                </svg>
+            </div>
         </div>
         <div class="col-xs-2"></div>
     </div>

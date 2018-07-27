@@ -3,6 +3,11 @@ function initializeVisualization() {
 }
 
 function dataloaded() {
+    d3.select("#loading-message")
+        .classed("invisible",true);
+    d3.select("#chart-id")
+        .classed("invisible",false);
+
     frameForward();
 }
 
@@ -15,7 +20,7 @@ function frameForward() {
     animateScene( true );
 }
 function frameBack() {
-    if (frame === 1) return;
+    if (frame === 0) return;
     toggleVisibility();
     toggleEnabled();
     toggleActive();

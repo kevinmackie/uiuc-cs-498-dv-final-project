@@ -1,7 +1,7 @@
 const annotations = {
     "scene-1":
         {
-            text: ["Up to 2002", "Small and slightly", "growing body of", "research."],
+            text: ["Decades prior to 2002", "Small and slightly", "growing body of research"],
             textCenter: {
                 year: 1993,
                 papers: 100

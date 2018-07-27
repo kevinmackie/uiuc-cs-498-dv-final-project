@@ -43,12 +43,44 @@ div .invisible{
 h1 {
     color: lightsteelblue;
 }
+
 .bar-papers-rect {
     fill: orange;
 }
 
+.y-axis-papers line {
+    stroke: orange;
+}
+
+.y-axis-papers path {
+    stroke: orange;
+}
+
+.y-axis-papers text {
+    fill: orange;
+}
+
+#yAxisPapersLabel {
+    fill: orange;
+}
+
+.y-axis-citations line {
+    stroke: steelblue;
+}
+
+.y-axis-citations path {
+    stroke: steelblue;
+}
+
+.y-axis-citations text {
+    fill: steelblue
+}
 .bar-papers-rect:hover {
     fill: darkorange;
+}
+
+#yAxisCitationsLabel {
+    fill: steelblue;
 }
 
 .bar-citations-rect {
@@ -60,8 +92,7 @@ h1 {
 }
 
 .chart text {
-    fill: black;
-    font: 10px sans-serif;
+    font: 11px sans-serif;
     text-anchor: end;
 }
 

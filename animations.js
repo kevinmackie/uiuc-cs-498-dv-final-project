@@ -1,6 +1,6 @@
 var animateFunctions = [
-    [null, null],
-    [animateScene1, null],
+    [animateScene0, null],
+    [animateScene1, deanimateScene1],
     [animateScene2,deanimateScene2],
     [animateScene3,deanimateScene3],
     [animateScene4,deanimateScene4]
@@ -58,8 +58,6 @@ function initializeChartArea() {
         .attr("height", canvas.height);
 }
 function createPaperBars() {
-console.log(referencesByYear);
-
     d3.select(".chart").selectAll(".bar-papers-group")
         .data(d3.values(referencesByYear))
         .enter()
@@ -79,30 +77,30 @@ console.log(referencesByYear);
 
 function showPaperBars( minYear, maxYear ) {
 
-        d3.selectAll(".bar-papers-rect")
-            .filter(function(d) { return ((d.year >= minYear) && (d.year <= maxYear))})
-            .transition()
-            .duration(1000)
-            .attr("height", function (d) {
-                return y_papers(d.papers);
-            })
-            .attr("y", function (d) {
-                return (chart_dimensions.height - y_papers(d.papers));
-            });
-        //
-        // .on("mouseover", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(200)
-        //         .style("opacity", .9);
-        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-        //         .style("left", (d3.event.pageX) + "px")
-        //         .style("top", (d3.event.pageY - 28) + "px");
-        // })
-        // .on("mouseout", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(1000)
-        //         .style("opacity", 0);
-        // })
+    d3.selectAll(".bar-papers-rect")
+        .filter(function(d) { return ((d.year >= minYear) && (d.year <= maxYear))})
+        .transition()
+        .duration(1000)
+        .attr("height", function (d) {
+            return y_papers(d.papers);
+        })
+        .attr("y", function (d) {
+            return (chart_dimensions.height - y_papers(d.papers));
+        });
+    //
+    // .on("mouseover", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(200)
+    //         .style("opacity", .9);
+    //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+    //         .style("left", (d3.event.pageX) + "px")
+    //         .style("top", (d3.event.pageY - 28) + "px");
+    // })
+    // .on("mouseout", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(1000)
+    //         .style("opacity", 0);
+    // })
 }
 
 function createCitationBars() {
@@ -130,19 +128,19 @@ function showCitationBars(minYear,maxYear) {
         .duration(1000)
         .attr("y",function (d) { return (chart_dimensions.height-y_citations(d.citations)); })
         .attr("height",function(d) { return y_citations(d.citations)});
-        // .on("mouseover", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(200)
-        //         .style("opacity", .9);
-        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-        //         .style("left", (d3.event.pageX) + "px")
-        //         .style("top", (d3.event.pageY - 28) + "px");
-        // })
-        // .on("mouseout", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(500)
-        //         .style("opacity", 0);
-        // });
+    // .on("mouseover", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(200)
+    //         .style("opacity", .9);
+    //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+    //         .style("left", (d3.event.pageX) + "px")
+    //         .style("top", (d3.event.pageY - 28) + "px");
+    // })
+    // .on("mouseout", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(500)
+    //         .style("opacity", 0);
+    // });
 }
 
 function showYearAxis() {
@@ -176,7 +174,7 @@ function createPaperAxis() {
 
     d3.select(".chart").append("g")
         .attr("id", "yAxisPapersG")
-        .classed("y axis papers",true)
+        .classed("y-axis-papers",true)
         .attr("transform", "translate(" + margin.left + "," + (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisPapers);
 
@@ -215,11 +213,12 @@ function createCitationAxis() {
 
     d3.select(".chart").append("g")
         .attr("id", "yAxisCitationsG")
-        .classed("y axis citations",true)
+        .classed("y-axis-citations",true)
         .attr("transform", "translate(" + (8 + margin.left + chart_dimensions.width) + "," +
             (margin.top + chart_dimensions.height + margin.bottom) + ")")
         .call(yAxisCitations)
         .selectAll("text")
+        .classed("citation-legend",true)
         .attr("x", 15)
         .attr("y", 0)
         .attr("dx", 0)
@@ -250,15 +249,87 @@ function showCitationAxis() {
         .attr("transform", "translate(" + (margin.left + chart_dimensions.width + 52) + "," +
             (margin.top + chart_dimensions.height/2) + "),rotate(-90)");
 }
+function showTitleIntro() {
+    d3.select("#chart-div")
+        .classed("invisible",false);
 
-function animateScene1() {
+    const div = d3.select("#chart-div")
+        .append("div");
+
+    div.attr("id","intro-title")
+        .attr("style","width: 900px; height: 500px; padding: 80px;position: relative; z-index: 2; top: 0; left: 0; background-color: rgb(158,202,225); opacity: 0");
+
+    div.append("h4")
+        .attr("align","left")
+        .html("Welcome");
+
+    div.append("p")
+        .html("<p>This website contains a narrative visualization presenting data related to research into cybersecurity " +
+            "for SCADA systems. SCADA (Supervisory Control and Data Acquisition) systems are used used for " +
+            "monitoring and control of critical infrastructure elements such as pipelines, power distribution " +
+            "networks, nuclear power facilities.</p>");
+
+    div.append("p")
+        .html("<p>The narrative visualization is divided into two parts. The first part presents the overarching " +
+            "story of SCADA security research as it has developed over the last 30+ years. This is done " +
+            "using animated bar charts showing key metrics of papers published and citations received year over year.</p>");
+
+    div.append("p")
+        .html("<p>The second part allows you to explore the literature yourself by filtering and selecting data " +
+            "and seeing the underlying research papers.</p>");
+    div.append("p")
+        .html("<p>Use the right arrow button in the top left of this page to navigate to the next scene in the " +
+            "narrative visualization.</p>");
+
+    d3.select("#intro-title")
+        .transition()
+        .duration(1000)
+        .style("opacity",0.95);
+
+    d3.select("#chart-id")
+        .transition()
+        .duration(1000)
+        .style("opacity",1.0);
+}
+function hideTitleIntro() {
+
+    d3.select("#intro-title")
+        .transition()
+        .duration(500)
+        .style("opacity",0)
+        .remove();
+
+}
+
+function animateScene0() {
+
+    showTitleIntro();
+
     initializeChartArea();
     calculateScales();
+
     createPaperBars();
     showYearAxis();
     createPaperAxis();
     showPaperAxis();
-    showPaperBars(0, 2001);
+    showPaperBars(0, 2019);
+
+    createCitationBars();
+    createCitationAxis();
+    showCitationAxis();
+    showCitationBars(0,2019);
+
+    showChartTitle("SCADA Cybersecurity Papers and Citations queried from Scopus, Year-over-Year, as of July 8th, 2018");
+}
+function animateScene1() {
+
+    hideTitleIntro();
+    hideCitationBars();
+    hideCitationAxis();
+    hidePaperBars(2002,2019);
+
+    showPaperBars(0,2001);
+    changeChartTitle("SCADA Cybersecurity Papers, Year-over-Year, from the ealiest available to 2001")
     insertAnnotation("scene-1");
 
 }
@@ -277,51 +348,63 @@ function createCitationCircles() {
         .attr("fill", "black")
         .attr("fill-opacity", "1")
         .attr("stroke-width", 0);
-        // .on("mouseover", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(200)
-        //         .style("opacity", .9);
-        //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
-        //         .style("left", (d3.event.pageX) + "px")
-        //         .style("top", (d3.event.pageY - 28) + "px");
-        // })
-        // .on("mouseout", function (d) {
-        //     tooltipDiv.transition()
-        //         .duration(500)
-        //         .style("opacity", 0);
-        // });
+    // .on("mouseover", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(200)
+    //         .style("opacity", .9);
+    //     tooltipDiv.html("Year: " + d.year + "<br/>" + "Papers: " + d.papers + "<br/>" + "Citations: " + d.citations)
+    //         .style("left", (d3.event.pageX) + "px")
+    //         .style("top", (d3.event.pageY - 28) + "px");
+    // })
+    // .on("mouseout", function (d) {
+    //     tooltipDiv.transition()
+    //         .duration(500)
+    //         .style("opacity", 0);
+    // });
 
 }
-function x() {
 
+function showChartTitle( title ) {
+    d3.select(".chart")
+        .append("text")
+        .attr("class","chart-title")
+        .attr("transform",
+            "translate(" + (margin.left + chart_dimensions.width / 2) + ","
+            + (margin.top / 2) + ")")
+        .style("text-anchor", "middle")
+        .style("opacity",0)
+        .text(title);
 
-    // d3.select("svg").append("text")
-    //     .attr("transform",
-    //         "translate(" + (margin.left + chart_dimensions.width / 2) + ","
-    //         + (margin.top / 2) + ")")
-    //     .style("text-anchor", "middle")
-    //     .text("SCADA Cybersecurity Papers and Citations, Year-over-Year, as of July 8th, 2018");
+    d3.select(".chart-title")
+        .transition()
+        .duration(1000)
+        .style("opacity",1);
+}
 
-    insertAnnotation("scene-1");
-
-    createLegend();
+function changeChartTitle(title) {
+    console.log(d3.select(".chart-title"));
+    d3.select(".chart-title")
+        .transition()
+        .duration(1000)
+        .text(title);
 }
 
 function animateScene2() {
     insertAnnotation("scene-2");
     showPaperBars(2002,2019);
+    changeChartTitle("SCADA Cybersecurity Papers, Year-over-Year, up to present (2018)")
 }
 
 function animateScene3() {
     removeAnnotation("scene-1");
     removeAnnotation("scene-2");
 
-
     createCitationAxis();
     showCitationAxis();
     createCitationBars();
     showCitationBars(0,2019);
 
+    changeChartTitle("SCADA Cybersecurity Papers Published and Citations Received (up to July 8th, 2018)");
     insertAnnotation("scene-3a");
     insertAnnotation("scene-3b");
     insertAnnotation("scene-3c");
@@ -426,9 +509,18 @@ function animateScene4() {
     morphCitationAxisForward();
     showCitationCircles();
 
+    changeChartTitle("Each paper published in Scopus plotted by year and citation count");
     enableBrush();
 
     createLegend();
+}
+
+function deanimateScene1() {
+    removeAnnotation("scene-1");
+    showPaperBars(2002,2019);
+    showCitationBars(0,2019);
+    showCitationAxis();
+    showTitleIntro();
 }
 function deanimateScene2() {
     removeAnnotation("scene-2");
@@ -684,7 +776,6 @@ function updateBrush() {
 }
 function categorySelected(category) {
     category_filter[category] = this.checked;
-    console.log("Category Selected "+ this.checked);
     updateLegend();
     updateReferencesTable();
 }

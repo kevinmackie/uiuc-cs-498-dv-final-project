@@ -9,7 +9,7 @@ const referencesByYear = {};
 
 let brush;
 
-var frame = 0;
+var frame = -1;
 
 const y_papers = d3.scaleLinear();
 const y_citations = d3.scaleLinear();
