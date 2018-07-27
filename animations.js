@@ -265,7 +265,7 @@ function showTitleIntro() {
 
     div.append("p")
         .html("<p>This website contains a narrative visualization presenting data related to research into cybersecurity " +
-            "for SCADA systems. SCADA (Supervisory Control and Data Acquisition) systems are used used for " +
+            "for SCADA systems. SCADA (Supervisory Control and Data Acquisition) systems are used for " +
             "monitoring and control of critical infrastructure elements such as pipelines, power distribution " +
             "networks, nuclear power facilities.</p>");
 
